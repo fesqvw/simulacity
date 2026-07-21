@@ -26,4 +26,6 @@ A city simulation.
 ### Ideas
 
 - Use OpenStreetMap to obtain real cities to simulate
-- ???
+- Use different simulation techniques to see how the whole changes?
+    - classic city-wide simulation
+    - purely agent-based
