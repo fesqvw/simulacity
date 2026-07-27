@@ -4,7 +4,6 @@ namespace Simulacity.Simulator;
 
 public class Simulator : ISimulator {
 
-
     public Simulator(){
     }
 
@@ -15,10 +14,9 @@ public class Simulator : ISimulator {
     public void Simulate(){
     }
 
-    public GridType GetCell(int x, int y)
+    public GridType GetCell(int x, int y, int size)
     {
         return GridType.Water;
     }
-
 
 }
