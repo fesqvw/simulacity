@@ -1,5 +1,8 @@
 public sealed class Street
 {
-    public Guid RoadSegmentId;
+    public Guid roadSegmentId;
+
+    public StreetAttributes attributes = new();
     
+    public StreetCrossSection crossSection = new();
 }
