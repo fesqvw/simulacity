@@ -1,11 +1,14 @@
-using Simulacity.Constants;
-
 namespace Simulacity.Simulator;
 
 public class Simulator : ISimulator {
 
-    public Simulator(){
+    SimulationState _state;
+
+    public Simulator(SimulationState initialState)
+    {
+        _state = initialState;
     }
+
 
     public void Init()
     {
@@ -14,9 +17,10 @@ public class Simulator : ISimulator {
     public void Simulate(){
     }
 
-    public GridType GetCell(int x, int y, int size)
+    
+    public List<River> GetRivers()
     {
-        return GridType.Water;
+        return _state.riverFeatures;
     }
 
 }

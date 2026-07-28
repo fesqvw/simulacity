@@ -2,8 +2,9 @@
 using Simulacity.Renderer.ConsoleRenderer;
 
 
-IRenderer renderer = new ConsoleRenderer();
-ISimulator simulator = new Simulator();
+SimulationState simulationState = Maps.Map1();
+ISimulator simulator = new Simulator(simulationState);
+IRenderer renderer = new ConsoleRenderer(simulator);
 
 simulator.Init();
 renderer.Init();
@@ -11,7 +12,7 @@ renderer.Init();
 while (true)
 {
     simulator.Simulate();
-    renderer.Render(simulator);
+    renderer.Render();
 
     Thread.Sleep(100);
 }

@@ -1,5 +1,5 @@
 public sealed class River : LinearFeature
 {
-    RiverAttributes attributes = new();
+    public RiverAttributes attributes = new();
     WaterType type = WaterType.River;
 }
