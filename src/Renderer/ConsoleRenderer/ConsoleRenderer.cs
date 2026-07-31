@@ -11,13 +11,6 @@ public class ConsoleRenderer : IRenderer {
 
     private ISimulator _simulator;
 
-    private static readonly Dictionary<GridType, char> gridSymbols = new()
-    {
-        { GridType.Empty,   ' ' },
-        { GridType.Border,  '#' },
-        { GridType.Water,   '~' },
-        { GridType.Ground,  '-' },
-    };
 
     private int width = renderingGridWidth;
     private int height = renderingGridHeight;
@@ -34,6 +27,7 @@ public class ConsoleRenderer : IRenderer {
     }
 
     public void Render(){
+        Console.SetCursorPosition(0, 0);
         Draw(_simulator);
     }
 
@@ -48,14 +42,8 @@ public class ConsoleRenderer : IRenderer {
             }
             sb.Append('\n');
         }
-/*
-        foreach (var rvp in riverPixels)
-        {
-            Console.Write($" {rvp.X} , {rvp.Y} \n");
-        }*/
 
         Console.Write(sb.ToString());
-        
     }
 
     private char DrawPixel(
@@ -75,20 +63,26 @@ public class ConsoleRenderer : IRenderer {
     {
         var all = new HashSet<CatmullRomRasterizer.Int2>();
 
-        var rs = simulator.GetRivers();
+        var state = simulator.GetState();
+        var rs = state.riverFeatures;
         for (int r = 0; r < rs.Count; ++r)
         {
-            var part = CatmullRomRasterizer.Rasterize(
-                    rs[r].Centerline.Points.Select((p) => p.Position).ToList(),
-                    rs[r].Centerline.Points.Select((p) => rs[r].attributes.AverageWidth).ToList(),
+            for (int rSeg = 0; rSeg < rs[r].SegmentIds.Count ; ++rSeg )
+            {
+                var seg = state.riverSegmentFeatures.First( (seg) => seg.Id == rs[r].SegmentIds[rSeg]);
+
+                var part = CatmullRomRasterizer.Rasterize(
+                    seg.Centerline.Points.Select((p) => p.Position).ToList(),
+                    seg.Centerline.Points.Select((p) => seg.attributes.AverageWidth).ToList(),
                     projectToRaster: p => new(
                         (int)MathF.Round(p.X),
                         (int)MathF.Round(p.Y)),
                     cellSize: new(cellSize, cellSize),
                     flatnessInCells: 0.5f,
-                    closed: rs[r].Centerline.Closed);
+                    closed: seg.Centerline.Closed);
 
                 all.UnionWith(part);
+            }
         }
 
         return all;

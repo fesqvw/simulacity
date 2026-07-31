@@ -4,4 +4,6 @@ public sealed class SplineCurve
     public SplineType Type;
     public bool Closed;
     public List<SplinePoint> Points = new();
+    public List<SplineSegment> Segments = new();
+    public BoundingBox BoundingBox;
 }

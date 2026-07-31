@@ -4,15 +4,62 @@ public class SplineFactory
 {
     public static SplineCurve FromPoints(IReadOnlyList<Vector3> points, bool closed)
     {
+        var splinePoints = Generate(points, closed: closed);
+
         SplineCurve c = new()
         {
-            Points = Generate(points, closed: closed),
-            Type = SplineType.CatmullRom
+            Points = splinePoints,
+            Type = SplineType.CatmullRom,
+            Closed = closed,
+            Segments = SegmentFromPoints(splinePoints),
         };
+
+        c.BoundingBox = FromPoints(c.Points);
 
         return c;
     }
 
+    private static List<SplineSegment> SegmentFromPoints(IReadOnlyList<SplinePoint> points)
+    {
+        List<SplineSegment> segs = new();
+        for (int i = 0; i < points.Count-1; i++)
+        {
+            segs.Add(
+                new SplineSegment()
+                {
+                    A = points[i],
+                    B = points[i+1],
+                    BoundingBox = FromPointPair(points[i], points[i+1]),
+                }
+            );
+        }
+        return segs; 
+    }
+
+    private static BoundingBox FromPointPair(SplinePoint pointA, SplinePoint pointB)
+    {
+        BoundingBox bb = new()
+        {
+            Max = Vector3.Max(pointA.Position, pointB.Position),
+            Min = Vector3.Min(pointA.Position, pointB.Position)  
+        }; 
+        return bb;
+    }
+
+    private static BoundingBox FromPoints(IReadOnlyList<SplinePoint> points)
+    {
+        BoundingBox bb = new();
+        Vector3 currMax = Vector3.One * float.MinValue;
+        Vector3 currMin = Vector3.One * float.MaxValue;
+        for (int i = 0; i < points.Count; i++)
+        {
+            currMax = Vector3.Max(currMax, points[i].Position);
+            currMin = Vector3.Min(currMin, points[i].Position);
+        }
+        bb.Max = currMax;
+        bb.Min = currMin;
+        return bb;
+    }
 
     private const float Alpha = 0.5f;
     private const float Epsilon = 1e-5f;

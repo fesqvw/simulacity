@@ -1,4 +1,4 @@
-public sealed class Street
+public sealed class Street : Feature
 {
     public Guid roadSegmentId;
 

@@ -1,13 +1,8 @@
-public sealed class RoadSegment : Feature
+public sealed class RoadSegment : LinearFeature
 {
-        public Guid RoadStrokeId;
-
-        // Topological meaning
+        public Guid RoadSegmentId; // self
+        public Guid RoadStrokeId; // parent
+        
         public Guid StartJunctionId;
         public Guid EndJunctionId;
-
-        // Geometric meaning
-        public CurveInterval GeometryOnStroke = new();
-
-        public Guid StreetSectionId;
 }

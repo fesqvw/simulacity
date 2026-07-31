@@ -1,5 +1,4 @@
-public sealed class River : LinearFeature
+public sealed class River : Feature
 {
-    public RiverAttributes attributes = new();
-    WaterType type = WaterType.River;
+    public List<Guid> SegmentIds = new();
 }

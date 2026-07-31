@@ -16,11 +16,10 @@ public class Simulator : ISimulator {
 
     public void Simulate(){
     }
-
     
-    public List<River> GetRivers()
-    {
-        return _state.riverFeatures;
-    }
 
+    public SimulationState GetState()
+    {
+        return _state;
+    }
 }
