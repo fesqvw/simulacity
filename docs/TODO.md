@@ -6,10 +6,12 @@
 - [x] Write the README, CLAUDE.md and the docs structure
 - [x] Choose the language and runtime: C# / .NET ([0003](decisions/0003-csharp-dotnet.md))
 - [x] Choose the first front end: a console simulator that takes commands, and a separate console renderer ([0004](decisions/0004-console-front-end.md))
-- [ ] Decide how the simulator sends state to the renderer: the transport, how the renderer starts, and what is sent (decision record, see the open questions in 0004)
+- [x] Decide how the simulator sends state to the renderer: through an interface, using named pipes first ([0005](decisions/0005-render-channel.md))
+- [ ] Decide how the renderer is started (suggestion: by hand, in a second terminal)
+- [ ] Decide what state is sent and in what format, once the state model exists (decision record)
 - [ ] Choose the simulation approach to start with: aggregate, agent-based, or both behind one interface (decision record)
 - [ ] Choose how the map and geometry are represented (grid, graph, splines…) (decision record)
-- [ ] Set up the .NET solution: an engine-agnostic core class library, a test project, and the two console apps (the simulator, which takes commands, and the renderer). Pick a target framework that Godot can reference.
+- [ ] Set up the .NET solution: an engine-agnostic core class library, a shared library for the renderer interface, a test project, and the two console apps (the simulator, which takes commands, and the renderer). Pick a target framework that Godot can reference.
 - [ ] Document the build, test and run commands in the README and CLAUDE.md
 
 ## Next: first playable slice

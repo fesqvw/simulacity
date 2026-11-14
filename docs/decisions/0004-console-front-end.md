@@ -34,6 +34,6 @@ Start with a console front end split across two programs, each with its own cons
 
 These still need deciding, each in its own record:
 
-- **How the simulator sends state to the renderer.** Suggestion: .NET named pipes (`System.IO.Pipes`), which work on Windows, Linux and macOS. The alternative is local TCP.
+- **How the simulator sends state to the renderer.** Decided in [0005](0005-render-channel.md): through an interface, using named pipes first.
 - **How the renderer is started.** Suggestion: start it by hand in a second terminal. Opening a new terminal window automatically depends on the platform.
 - **What gets sent.** For example, full snapshots of the state or only the changes.
