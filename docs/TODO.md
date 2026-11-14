@@ -4,10 +4,11 @@
 
 - [x] Reset the repository
 - [x] Write the README, CLAUDE.md and the docs structure
-- [ ] Choose the tech stack: language, runtime, rendering (decision record)
+- [x] Choose the language and runtime: C# / .NET ([0003](decisions/0003-csharp-dotnet.md))
+- [ ] Choose the first renderer or front end (console, Godot, other) (decision record)
 - [ ] Choose the simulation approach to start with: aggregate, agent-based, or both behind one interface (decision record)
 - [ ] Choose how the map and geometry are represented (grid, graph, splines…) (decision record)
-- [ ] Set up the project skeleton, build, tests and `.gitignore` for the chosen stack
+- [ ] Set up the .NET solution: an engine-agnostic core class library, a test project, and a first front end. Pick a target framework that Godot can reference.
 - [ ] Document the build, test and run commands in the README and CLAUDE.md
 
 ## Next: first playable slice
@@ -21,6 +22,7 @@
 - [ ] Buildings: residential, industrial, commercial
 - [ ] Transport: foot, car, then public transport (bus, tram, train, subway)
 - [ ] Entities moving through the network
+- [ ] Connect the simulation core to a Godot project
 - [ ] Import real cities from OpenStreetMap
 - [ ] *(optional)* Utilities: water, electricity
 - [ ] *(optional)* Special industry

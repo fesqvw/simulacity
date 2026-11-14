@@ -45,4 +45,4 @@ Project documentation is in [`docs/`](docs/README.md):
 
 ## Getting started
 
-To be written once a tech stack is chosen (see [`docs/TODO.md`](docs/TODO.md)).
+Simulacity is written in C# / .NET, and a Godot front end is planned. Build instructions will be added once the .NET solution is set up (see [`docs/TODO.md`](docs/TODO.md)).

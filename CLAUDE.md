@@ -6,6 +6,8 @@ This file gives Claude Code guidance for working in this repository.
 
 Simulacity is a city simulation (transport, buildings, land, optionally utilities). See [`README.md`](README.md) for the vision and feature list.
 
+It's written in **C# / .NET**, with a Godot front end planned for later ([decision 0003](docs/decisions/0003-csharp-dotnet.md)). Keep the simulation core free of any Godot or rendering dependency, so a Godot project can reference it.
+
 The project is **starting over from scratch**. The earlier attempt (C# / .NET 10 console app with spline-based road geometry and a console renderer) still exists in git history before commit `9e0210f`. Look at it for reference when useful, but don't restore code from it unless asked.
 
 ## Documentation workflow
@@ -31,4 +33,4 @@ All project knowledge goes in `docs/`. Keep it current as part of the work, not 
 
 ## Commands
 
-None yet. The tech stack hasn't been chosen (see `docs/TODO.md`).
+None yet. The .NET solution hasn't been set up (see `docs/TODO.md`).
