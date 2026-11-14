@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Simulacity.Core\Simulacity.Core.csproj" />
+    <ProjectReference Include="..\..\src\Simulacity.Contracts\Simulacity.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Simulacity.Transport.NamedPipes\Simulacity.Transport.NamedPipes.csproj" />
+  </ItemGroup>
+</Project>
