@@ -18,4 +18,4 @@ Don't edit an accepted decision to change it. Write a new record and set the old
 | [0001](0001-record-decisions.md) | Record decisions in `docs/decisions/` | Accepted |
 | [0002](0002-start-over.md) | Start the project over from scratch | Accepted |
 | [0003](0003-csharp-dotnet.md) | Use C# and .NET | Accepted |
-| [0004](0004-console-front-end.md) | Console front end, with separate command and render consoles | Accepted |
+| [0004](0004-console-front-end.md) | Console front end: a simulator that takes commands, and a separate renderer | Accepted |
