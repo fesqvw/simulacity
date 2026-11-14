@@ -36,6 +36,28 @@ All project knowledge goes in `docs/`. Keep it current as part of the work, not 
 - Keep commits focused, with messages that say what changed and why.
 - When the build, test or run commands are set up, document them in the **Commands** section below and in the README.
 
+## Project layout
+
+See [decision 0006](docs/decisions/0006-solution-layout.md) for the full rationale.
+
+- `src/Simulacity.Core`: the simulation. It references nothing else in the solution. Never add a Godot, renderer or transport dependency to it.
+- `src/Simulacity.Contracts`: `IStatePublisher`, `IStateReceiver` and `SimulationSnapshot`. Also free of Godot and transport dependencies.
+- `src/Simulacity.Transport.NamedPipes`: the named-pipe implementations of the Contracts interfaces.
+- `src/Simulacity.Simulator`: the simulator console app. `CommandInterpreter` holds the commands.
+- `src/Simulacity.Renderer.Console`: the renderer console app. Must never reference `Simulacity.Core`.
+- `tests/Simulacity.Tests`: xUnit tests.
+
+Shared build settings (`net10.0`, nullable, warnings as errors) are in `Directory.Build.props`. Don't repeat them in project files.
+
+`SimulationSnapshot` and the pipe's JSON framing are provisional until what gets sent is decided (decision 0005).
+
 ## Commands
 
-None yet. The .NET solution hasn't been set up (see `docs/TODO.md`).
+```sh
+dotnet build                                          # build the solution
+dotnet test                                           # run all tests
+dotnet run --project src/Simulacity.Simulator         # run the simulator (reads commands from stdin)
+dotnet run --project src/Simulacity.Renderer.Console  # run the renderer (in another terminal)
+```
+
+Build and test before committing. The build treats warnings as errors.

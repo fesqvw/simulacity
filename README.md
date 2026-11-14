@@ -45,4 +45,34 @@ Project documentation is in [`docs/`](docs/README.md):
 
 ## Getting started
 
-Simulacity is written in C# / .NET, and a Godot front end is planned. Build instructions will be added once the .NET solution is set up (see [`docs/TODO.md`](docs/TODO.md)).
+Simulacity is written in C# / .NET, and a Godot front end is planned. You need the [.NET 10 SDK](https://dotnet.microsoft.com/download).
+
+```sh
+dotnet build   # build everything
+dotnet test    # run the tests
+```
+
+The simulation runs as two programs, each in its own terminal:
+
+```sh
+# Terminal 1: the simulator. Type commands here ('help' lists them).
+dotnet run --project src/Simulacity.Simulator
+
+# Terminal 2: the renderer. It only draws what the simulator sends.
+dotnet run --project src/Simulacity.Renderer.Console
+```
+
+You can start them in either order. The renderer waits for the simulator, and reconnects if the simulator restarts.
+
+## Project layout
+
+| Path | What it is |
+| --- | --- |
+| `src/Simulacity.Core` | The simulation |
+| `src/Simulacity.Contracts` | The interface for sending state to renderers |
+| `src/Simulacity.Transport.NamedPipes` | That interface over named pipes |
+| `src/Simulacity.Simulator` | Console app: takes commands and runs the simulation |
+| `src/Simulacity.Renderer.Console` | Console app: draws the simulation |
+| `tests/Simulacity.Tests` | Tests |
+
+See [decision 0006](docs/decisions/0006-solution-layout.md) for why it's laid out this way.

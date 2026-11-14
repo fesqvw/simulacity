@@ -20,3 +20,4 @@ Don't edit an accepted decision to change it. Write a new record and set the old
 | [0003](0003-csharp-dotnet.md) | Use C# and .NET | Accepted |
 | [0004](0004-console-front-end.md) | Console front end: a simulator that takes commands, and a separate renderer | Accepted |
 | [0005](0005-render-channel.md) | Send state to renderers through an interface, using named pipes first | Accepted |
+| [0006](0006-solution-layout.md) | Solution layout and target framework | Accepted |

@@ -10,8 +10,8 @@
 - [x] Decide how the renderer is started: by hand, in a second terminal ([0005](decisions/0005-render-channel.md))
 - [ ] Choose the simulation approach to start with: aggregate, agent-based, or both behind one interface (decision record)
 - [ ] Choose how the map and geometry are represented (grid, graph, splines…) (decision record)
-- [ ] Set up the .NET solution: an engine-agnostic core class library, a shared library for the renderer interface, a test project, and the two console apps (the simulator, which takes commands, and the renderer). Pick a target framework that Godot can reference.
-- [ ] Document the build, test and run commands in the README and CLAUDE.md
+- [x] Set up the .NET solution: core, contracts, named-pipe transport, simulator, renderer and tests, targeting `net10.0` ([0006](decisions/0006-solution-layout.md))
+- [x] Document the build, test and run commands in the README and CLAUDE.md
 
 ## Next: first playable slice
 
@@ -25,7 +25,7 @@
 - [ ] Buildings: residential, industrial, commercial
 - [ ] Transport: foot, car, then public transport (bus, tram, train, subway)
 - [ ] Entities moving through the network
-- [ ] Connect the simulation core to a Godot project
+- [ ] Connect the simulation core to a Godot project (first check that the Godot version can reference `net10.0` libraries, see 0006)
 - [ ] Import real cities from OpenStreetMap
 - [ ] *(optional)* Utilities: water, electricity
 - [ ] *(optional)* Special industry

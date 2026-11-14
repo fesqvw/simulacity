@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Simulacity.Contracts/Simulacity.Contracts.csproj" />
+    <Project Path="src/Simulacity.Core/Simulacity.Core.csproj" />
+    <Project Path="src/Simulacity.Renderer.Console/Simulacity.Renderer.Console.csproj" />
+    <Project Path="src/Simulacity.Simulator/Simulacity.Simulator.csproj" />
+    <Project Path="src/Simulacity.Transport.NamedPipes/Simulacity.Transport.NamedPipes.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Simulacity.Tests/Simulacity.Tests.csproj" />
+  </Folder>
+</Solution>
