@@ -11,7 +11,7 @@ It's written in **C# / .NET**, with a Godot front end planned for later ([decisi
 - **The simulator** reads commands, owns and runs the simulation, and is the only thing that changes its state.
 - **The renderer** only draws the state the simulator sends it. It never runs simulation logic, keeps its own state, or accepts commands.
 
-The simulator sends state through an interface, never by calling a transport directly ([decision 0005](docs/decisions/0005-render-channel.md)). The first implementation uses named pipes, and Godot will use the same interface later. Keep the interface in a shared library that has no Godot or transport dependency.
+The simulator sends state through an interface, never by calling a transport directly ([decision 0005](docs/decisions/0005-render-channel.md)). The first implementation uses named pipes, and Godot will use the same interface later. The renderer is started by hand, so either program can start first: the simulator must run fine with no renderer connected, and the renderer must wait for the simulator if it isn't running yet. Keep the interface in a shared library that has no Godot or transport dependency.
 
 The project is **starting over from scratch**. The earlier attempt (C# / .NET 10 console app with spline-based road geometry and a console renderer) still exists in git history before commit `9e0210f`. Look at it for reference when useful, but don't restore code from it unless asked.
 

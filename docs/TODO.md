@@ -7,8 +7,7 @@
 - [x] Choose the language and runtime: C# / .NET ([0003](decisions/0003-csharp-dotnet.md))
 - [x] Choose the first front end: a console simulator that takes commands, and a separate console renderer ([0004](decisions/0004-console-front-end.md))
 - [x] Decide how the simulator sends state to the renderer: through an interface, using named pipes first ([0005](decisions/0005-render-channel.md))
-- [ ] Decide how the renderer is started (suggestion: by hand, in a second terminal)
-- [ ] Decide what state is sent and in what format, once the state model exists (decision record)
+- [x] Decide how the renderer is started: by hand, in a second terminal ([0005](decisions/0005-render-channel.md))
 - [ ] Choose the simulation approach to start with: aggregate, agent-based, or both behind one interface (decision record)
 - [ ] Choose how the map and geometry are represented (grid, graph, splines…) (decision record)
 - [ ] Set up the .NET solution: an engine-agnostic core class library, a shared library for the renderer interface, a test project, and the two console apps (the simulator, which takes commands, and the renderer). Pick a target framework that Godot can reference.
@@ -16,6 +15,7 @@
 
 ## Next: first playable slice
 
+- [ ] Once work on the simulation model has started, decide what state the simulator sends to renderers and in what format (decision record, see 0005)
 - [ ] Load or define a small map (ground and water)
 - [ ] Roads and their topology (graph of intersections and segments)
 - [ ] Render the map
