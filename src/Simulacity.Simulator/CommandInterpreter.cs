@@ -27,7 +27,8 @@ public sealed class CommandInterpreter(Simulation simulation, IStatePublisher pu
           status                       show the current state
           node <x> <y> [z]             add a road node at a world position, in metres
                                        (z defaults to the ground height there)
-          road <from> <to> [x,y[,z]]…  add a road between two nodes, optionally through points
+          road <from> <to> [x,y[,z]]…  add a road between two nodes, optionally through points.
+                                       It joins roads it crosses at the same height
           remove <segment>             remove a road segment (its nodes stay)
           roads                        list the road nodes and segments
           land <type> <x> <y> [<x2> <y2>]
@@ -180,9 +181,45 @@ public sealed class CommandInterpreter(Simulation simulation, IStatePublisher pu
             points.Add(new Point3(x, y, z));
         }
 
-        RoadSegment segment = World.Roads.AddSegment(start, end, new PolylineShape(points));
-        return ($"Added road {segment.Id} from {start} to {end}, {Format(World.Roads.LengthOf(segment.Id))} m long.", true);
+        RoadAddition addition;
+        try
+        {
+            addition = World.Roads.AddRoad(start, end, new PolylineShape(points));
+        }
+        catch (ArgumentException exception)
+        {
+            return (exception.Message, false);
+        }
+
+        return (DescribeAddition(start, end, addition), true);
     }
+
+    private string DescribeAddition(NodeId start, NodeId end, RoadAddition addition)
+    {
+        RoadNetwork roads = World.Roads;
+        double length = addition.Segments.Sum(segment => roads.LengthOf(segment.Id));
+        var text = new StringBuilder();
+        text.Append(addition.Segments.Count == 1
+            ? $"Added road {addition.Segments[0].Id} from {start} to {end}, {Format(length)} m long."
+            : $"Added road from {start} to {end} as {JoinIds(addition.Segments)}, {Format(length)} m long.");
+
+        foreach (RoadNode node in addition.NewNodes)
+        {
+            text.AppendLine().Append(CultureInfo.InvariantCulture, $"Added junction {node.Id} at {FormatPoint(node.Position)}.");
+        }
+
+        foreach (RoadSplit split in addition.Splits)
+        {
+            text.AppendLine().Append(CultureInfo.InvariantCulture, $"Split road {split.Removed} into {JoinIds(split.Pieces)}.");
+        }
+
+        return text.ToString();
+    }
+
+    private static string JoinIds(IReadOnlyList<RoadSegment> segments) =>
+        segments.Count == 2
+            ? $"{segments[0].Id} and {segments[1].Id}"
+            : string.Join(", ", segments.Select(segment => segment.Id));
 
     private (string Output, bool Changed) RemoveRoad(string[] arguments)
     {

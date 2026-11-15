@@ -21,7 +21,9 @@
 - [x] Land grid and road graph (intersections and polyline segments) in `Simulacity.Core`, owned by `World`
 - [x] Make the world 3D: z elevation on every point, and a terrain heightmap on the land grid ([0009](decisions/0009-3d-world.md))
 - [ ] Decide what happens when a road runs over water at ground level: forbid it, or let it be a ford. Today it is allowed and drawn as a normal road
-- [ ] Split segments where a new road crosses an existing one at the same height (segment intersection, then a spatial index). Roads at different heights pass over or under each other
+- [x] Split segments where a new road crosses an existing one at the same height. Roads at different heights pass over or under each other ([0011](decisions/0011-roads-meet-at-crossings.md))
+- [ ] Add a spatial index for road pieces, so adding a road doesn't check every segment (0011)
+- [ ] Handle a road that crosses itself, and decide whether two nodes in the same place should be merged (0011)
 - [x] Render the map: land, roads, bridges, tunnels and nodes, top-down and scaled to fit the console (`MapView`)
 
 ## Later

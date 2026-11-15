@@ -171,6 +171,41 @@ public class CommandInterpreterTests
     }
 
     [Fact]
+    public async Task Road_that_crosses_another_reports_the_junction_and_the_split()
+    {
+        foreach (string line in (string[])["node 0 20", "node 40 20", "road n1 n2", "node 10 0", "node 10 40"])
+        {
+            await _interpreter.ExecuteAsync(line);
+        }
+
+        CommandResult result = await _interpreter.ExecuteAsync("road n3 n4");
+
+        Assert.Equal(
+            """
+            Added road from n3 to n4 as s4 and s5, 40 m long.
+            Added junction n5 at (10, 20, 0).
+            Split road s1 into s2 and s3.
+            """.ReplaceLineEndings(),
+            result.Output.ReplaceLineEndings());
+        Assert.Equal(4, _simulation.World.Roads.Segments.Count);
+    }
+
+    [Fact]
+    public async Task Road_that_would_overlap_another_is_refused()
+    {
+        foreach (string line in (string[])["node 0 0", "node 30 0", "road n1 n2", "node 10 0", "node 40 0"])
+        {
+            await _interpreter.ExecuteAsync(line);
+        }
+
+        CommandResult result = await _interpreter.ExecuteAsync("road n3 n4");
+
+        Assert.Contains("would run along s1", result.Output);
+        Assert.Single(_simulation.World.Roads.Segments);
+        Assert.Equal(5, _publisher.Published.Count);
+    }
+
+    [Fact]
     public async Task Remove_deletes_a_road_but_keeps_its_nodes()
     {
         await _interpreter.ExecuteAsync("node 0 0");

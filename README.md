@@ -74,7 +74,20 @@ road n1 n2 290,160,8 350,160,8
 roads
 ```
 
-This turns a column of cells (300–340 m from the west edge) into water, adds a node on the ground on each bank, and joins them with a road that rises to an 8 m deck over the water. `help` lists every command. The renderer draws the map from above, with north at the top: `.` ground, `~` water, `#` road, `=` bridge, `:` tunnel and `o` node.
+This turns a column of cells (300–340 m from the west edge) into water, adds a node on the ground on each bank, and joins them with a road that rises to an 8 m deck over the water.
+
+Roads that cross at the same height are joined at a new junction node, and the roads they cross are split there ([decision 0011](docs/decisions/0011-roads-meet-at-crossings.md)). A road that passes more than 1 m above or below another, like the bridge above, doesn't meet it. Continuing the example, this adds two roads on the ground west of the river that cross at a new junction, `n7`:
+
+```text
+node 50 100
+node 250 100
+road n3 n4
+node 150 40
+node 150 200
+road n5 n6
+```
+
+`help` lists every command. The renderer draws the map from above, with north at the top: `.` ground, `~` water, `#` road, `=` bridge, `:` tunnel and `o` node.
 
 ## Project layout
 
