@@ -21,3 +21,5 @@ Don't edit an accepted decision to change it. Write a new record and set the old
 | [0004](0004-console-front-end.md) | Console front end: a simulator that takes commands, and a separate renderer | Accepted |
 | [0005](0005-render-channel.md) | Send state to renderers through an interface, using named pipes first | Accepted |
 | [0006](0006-solution-layout.md) | Solution layout and target framework | Accepted |
+| [0007](0007-map-geometry.md) | Map and geometry: a road graph with polyline segments, and a land grid | Accepted |
+| [0008](0008-simulation-approach.md) | Simulation approach: a shared world, with agent-based simulation first | Accepted |
