@@ -74,7 +74,7 @@ road n1 n2 290,160,8 350,160,8
 roads
 ```
 
-This turns a column of cells (300–340 m from the west edge) into water, adds a node on the ground on each bank, and joins them with a road that rises to an 8 m deck over the water. `help` lists every command. The renderer doesn't draw the map yet.
+This turns a column of cells (300–340 m from the west edge) into water, adds a node on the ground on each bank, and joins them with a road that rises to an 8 m deck over the water. `help` lists every command. The renderer draws the map from above, with north at the top: `.` ground, `~` water, `#` road, `=` bridge, `:` tunnel and `o` node.
 
 ## Project layout
 

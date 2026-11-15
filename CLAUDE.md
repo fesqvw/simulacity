@@ -44,12 +44,12 @@ See [decision 0006](docs/decisions/0006-solution-layout.md) for the full rationa
 - `src/Simulacity.Contracts`: `IStatePublisher`, `IStateReceiver` and `SimulationSnapshot`. Also free of Godot and transport dependencies.
 - `src/Simulacity.Transport.NamedPipes`: the named-pipe implementations of the Contracts interfaces.
 - `src/Simulacity.Simulator`: the simulator console app. `CommandInterpreter` holds the commands.
-- `src/Simulacity.Renderer.Console`: the renderer console app. Must never reference `Simulacity.Core`.
+- `src/Simulacity.Renderer.Console`: the renderer console app. Must never reference `Simulacity.Core`. `MapView` draws a snapshot as text.
 - `tests/Simulacity.Tests`: xUnit tests.
 
 Shared build settings (`net10.0`, nullable, warnings as errors) are in `Directory.Build.props`. Don't repeat them in project files.
 
-`SimulationSnapshot` and the pipe's JSON framing are provisional until what gets sent is decided (decision 0005).
+A `SimulationSnapshot` is the full drawable state of the world (land, terrain heights, and roads as polylines), sent as length-prefixed JSON after every change ([decision 0010](docs/decisions/0010-snapshot-contents.md)). The simulator builds it in `SnapshotBuilder`. Renderers must be able to draw from any single snapshot.
 
 ## Commands
 

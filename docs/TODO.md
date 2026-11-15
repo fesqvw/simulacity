@@ -15,13 +15,14 @@
 
 ## Next: first playable slice
 
-- [ ] Once work on the simulation model has started, decide what state the simulator sends to renderers and in what format (decision record, see 0005)
+- [x] Decide what the simulator sends to renderers: full snapshots of land, terrain and road polylines, as JSON ([0010](decisions/0010-snapshot-contents.md))
 - [ ] Load or define a small map (ground and water). The simulator starts with an all-ground 64 × 32 grid of 10 m cells for now
 - [x] Simulator commands to add roads, paint land and set terrain height (`node`, `road`, `remove`, `roads`, `land`, `height`)
 - [x] Land grid and road graph (intersections and polyline segments) in `Simulacity.Core`, owned by `World`
 - [x] Make the world 3D: z elevation on every point, and a terrain heightmap on the land grid ([0009](decisions/0009-3d-world.md))
+- [ ] Decide what happens when a road runs over water at ground level: forbid it, or let it be a ford. Today it is allowed and drawn as a normal road
 - [ ] Split segments where a new road crosses an existing one at the same height (segment intersection, then a spatial index). Roads at different heights pass over or under each other
-- [ ] Render the map
+- [x] Render the map: land, roads, bridges, tunnels and nodes, top-down and scaled to fit the console (`MapView`)
 
 ## Later
 

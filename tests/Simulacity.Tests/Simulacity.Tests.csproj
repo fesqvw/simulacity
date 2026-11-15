@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\src\Simulacity.Core\Simulacity.Core.csproj" />
     <ProjectReference Include="..\..\src\Simulacity.Contracts\Simulacity.Contracts.csproj" />
     <ProjectReference Include="..\..\src\Simulacity.Transport.NamedPipes\Simulacity.Transport.NamedPipes.csproj" />
+    <ProjectReference Include="..\..\src\Simulacity.Renderer.Console\Simulacity.Renderer.Console.csproj" />
     <ProjectReference Include="..\..\src\Simulacity.Simulator\Simulacity.Simulator.csproj" />
   </ItemGroup>
 </Project>

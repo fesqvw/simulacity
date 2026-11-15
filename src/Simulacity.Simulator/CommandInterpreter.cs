@@ -79,7 +79,7 @@ public sealed class CommandInterpreter(Simulation simulation, IStatePublisher pu
 
     /// <summary>Sends the current state to the renderers.</summary>
     public Task PublishAsync(CancellationToken cancellationToken = default) =>
-        publisher.PublishAsync(new SimulationSnapshot(simulation.Tick), cancellationToken);
+        publisher.PublishAsync(SnapshotBuilder.From(simulation), cancellationToken);
 
     private (string Output, bool Changed) Step(string[] arguments)
     {

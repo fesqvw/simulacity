@@ -8,8 +8,7 @@ namespace Simulacity.Transport.NamedPipes;
 /// Writes and reads snapshots on a stream: a 4-byte little-endian length, then the snapshot as UTF-8 JSON.
 /// </summary>
 /// <remarks>
-/// Provisional format: what gets sent, and how, will be decided once work on the simulation model
-/// has started (decision 0005).
+/// What gets sent, and in this format, is decided in decision 0010.
 /// </remarks>
 internal static class SnapshotFraming
 {

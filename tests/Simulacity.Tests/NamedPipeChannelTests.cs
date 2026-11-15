@@ -22,7 +22,7 @@ public class NamedPipeChannelTests
         var stopwatch = Stopwatch.StartNew();
         for (int tick = 0; tick < 100; tick++)
         {
-            await publisher.PublishAsync(new SimulationSnapshot(tick));
+            await publisher.PublishAsync(Snapshot(tick));
         }
 
         Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(1), $"Publishing took {stopwatch.Elapsed}.");
@@ -32,17 +32,17 @@ public class NamedPipeChannelTests
     public async Task A_renderer_started_after_the_simulator_gets_the_latest_state_then_updates()
     {
         await using var publisher = new NamedPipeStatePublisher(_pipeName);
-        await publisher.PublishAsync(new SimulationSnapshot(1));
-        await publisher.PublishAsync(new SimulationSnapshot(2));
+        await publisher.PublishAsync(Snapshot(1));
+        await publisher.PublishAsync(Snapshot(2));
 
         using var cancel = new CancellationTokenSource(Timeout);
         await using var receiver = new NamedPipeStateReceiver(_pipeName);
         await using IAsyncEnumerator<SimulationSnapshot> snapshots = receiver.ReceiveAsync(cancel.Token).GetAsyncEnumerator(cancel.Token);
 
-        Assert.Equal(new SimulationSnapshot(2), await NextAsync(snapshots));
+        Assert.Equivalent(Snapshot(2), await NextAsync(snapshots), strict: true);
 
-        await publisher.PublishAsync(new SimulationSnapshot(3));
-        Assert.Equal(new SimulationSnapshot(3), await NextAsync(snapshots));
+        await publisher.PublishAsync(Snapshot(3));
+        Assert.Equivalent(Snapshot(3), await NextAsync(snapshots), strict: true);
     }
 
     [Fact]
@@ -57,10 +57,10 @@ public class NamedPipeChannelTests
         Assert.False(first.IsCompleted);
 
         await using var publisher = new NamedPipeStatePublisher(_pipeName);
-        await publisher.PublishAsync(new SimulationSnapshot(7));
+        await publisher.PublishAsync(Snapshot(7));
 
         Assert.True(await first);
-        Assert.Equal(new SimulationSnapshot(7), snapshots.Current);
+        Assert.Equivalent(Snapshot(7), snapshots.Current, strict: true);
     }
 
     [Fact]
@@ -74,14 +74,14 @@ public class NamedPipeChannelTests
 
         await using (var first = new NamedPipeStatePublisher(_pipeName))
         {
-            await first.PublishAsync(new SimulationSnapshot(1));
-            Assert.Equal(new SimulationSnapshot(1), await NextAsync(snapshots));
+            await first.PublishAsync(Snapshot(1));
+            Assert.Equivalent(Snapshot(1), await NextAsync(snapshots), strict: true);
         }
 
         await using var second = new NamedPipeStatePublisher(_pipeName);
-        await second.PublishAsync(new SimulationSnapshot(10));
+        await second.PublishAsync(Snapshot(10));
 
-        Assert.Equal(new SimulationSnapshot(10), await NextAsync(snapshots));
+        Assert.Equivalent(Snapshot(10), await NextAsync(snapshots), strict: true);
         lock (connectionChanges)
         {
             Assert.Equal([true, false, true], connectionChanges);
@@ -101,19 +101,19 @@ public class NamedPipeChannelTests
         ValueTask<bool> nextB = b.MoveNextAsync();
 
         await WaitUntilAsync(() => publisher.ConnectedRenderers == 2);
-        await publisher.PublishAsync(new SimulationSnapshot(5));
+        await publisher.PublishAsync(Snapshot(5));
 
         Assert.True(await nextA);
         Assert.True(await nextB);
-        Assert.Equal(new SimulationSnapshot(5), a.Current);
-        Assert.Equal(new SimulationSnapshot(5), b.Current);
+        Assert.Equivalent(Snapshot(5), a.Current, strict: true);
+        Assert.Equivalent(Snapshot(5), b.Current, strict: true);
     }
 
     [Fact]
     public async Task The_simulator_forgets_a_renderer_that_closes()
     {
         await using var publisher = new NamedPipeStatePublisher(_pipeName);
-        await publisher.PublishAsync(new SimulationSnapshot(1));
+        await publisher.PublishAsync(Snapshot(1));
 
         using (var cancel = new CancellationTokenSource(Timeout))
         {
@@ -124,8 +124,17 @@ public class NamedPipeChannelTests
         }
 
         await WaitUntilAsync(() => publisher.ConnectedRenderers == 0);
-        await publisher.PublishAsync(new SimulationSnapshot(2));
+        await publisher.PublishAsync(Snapshot(2));
     }
+
+    /// <summary>A small but complete snapshot: a 2 × 1 grid with a water cell, and one bridge.</summary>
+    private static SimulationSnapshot Snapshot(long tick) =>
+        new(
+            tick,
+            new LandSnapshot(2, 1, 10, [LandKind.Ground, LandKind.Water], [0, 1.5, 3, 0, -2, 4]),
+            new RoadsSnapshot(
+                [new RoadNodeSnapshot(1, new Position(0, 5, 0)), new RoadNodeSnapshot(2, new Position(20, 5, 3))],
+                [new RoadSegmentSnapshot(7, 1, 2, [new Position(0, 5, 0), new Position(10, 5, 6.25), new Position(20, 5, 3)])]));
 
     private static async Task<SimulationSnapshot> NextAsync(IAsyncEnumerator<SimulationSnapshot> snapshots)
     {
