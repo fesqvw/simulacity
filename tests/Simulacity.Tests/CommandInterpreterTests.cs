@@ -1,12 +1,13 @@
 using Simulacity.Contracts;
 using Simulacity.Core;
+using Simulacity.Core.Land;
 using Simulacity.Simulator;
 
 namespace Simulacity.Tests;
 
 public class CommandInterpreterTests
 {
-    private readonly Simulation _simulation = new();
+    private readonly Simulation _simulation = new(new World(new LandGrid(4, 4, 10)));
     private readonly RecordingPublisher _publisher = new();
     private readonly CommandInterpreter _interpreter;
 

@@ -1,4 +1,5 @@
 using Simulacity.Core;
+using Simulacity.Core.Land;
 using Simulacity.Simulator;
 using Simulacity.Transport.NamedPipes;
 
@@ -6,7 +7,7 @@ using Simulacity.Transport.NamedPipes;
 // (decisions 0004 and 0005). Start the renderer by hand in another terminal to watch it.
 
 await using var publisher = new NamedPipeStatePublisher();
-var interpreter = new CommandInterpreter(new Simulation(), publisher);
+var interpreter = new CommandInterpreter(new Simulation(new World(new LandGrid(64, 32, 10))), publisher);
 await interpreter.PublishAsync();
 
 Console.WriteLine("Simulacity simulator. Type 'help' for the list of commands.");

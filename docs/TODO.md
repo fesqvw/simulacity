@@ -16,8 +16,9 @@
 ## Next: first playable slice
 
 - [ ] Once work on the simulation model has started, decide what state the simulator sends to renderers and in what format (decision record, see 0005)
-- [ ] Load or define a small map (ground and water)
-- [ ] Roads and their topology (graph of intersections and segments)
+- [ ] Load or define a small map (ground and water). The simulator starts with an all-ground 64 × 32 grid of 10 m cells for now
+- [ ] Simulator commands to add roads and paint land
+- [x] Land grid and road graph (intersections and polyline segments) in `Simulacity.Core`, owned by `World`
 - [ ] Split segments where a new road crosses an existing one (segment intersection, then a spatial index)
 - [ ] Render the map
 
