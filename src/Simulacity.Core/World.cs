@@ -94,11 +94,46 @@ public sealed class World(LandGrid land)
     /// <exception cref="InvalidOperationException">
     /// A road would then run at ground level over water. Nothing is changed.
     /// </exception>
-    public void SetCornerElevation(int i, int j, double elevation)
+    public void SetCornerElevation(int i, int j, double elevation) => SetCornerElevations([(i, j, elevation)]);
+
+    /// <summary>
+    /// Sets the ground elevation at several cell corners at once, in metres, as one change: either
+    /// all of them are set or none are.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">A corner is outside the grid. Nothing is changed.</exception>
+    /// <exception cref="ArgumentException">An elevation isn't a finite number. Nothing is changed.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// A road would then run at ground level over water. Nothing is changed.
+    /// </exception>
+    public void SetCornerElevations(IEnumerable<(int I, int J, double Elevation)> corners)
     {
-        double previous = Land.GetCornerElevation(i, j);
-        Land.SetCornerElevation(i, j, elevation);
-        RevertIfRoadInWater(() => Land.SetCornerElevation(i, j, previous));
+        ArgumentNullException.ThrowIfNull(corners);
+
+        var previous = new List<(int I, int J, double Elevation)>();
+        void Revert()
+        {
+            for (int k = previous.Count - 1; k >= 0; k--)
+            {
+                Land.SetCornerElevation(previous[k].I, previous[k].J, previous[k].Elevation);
+            }
+        }
+
+        try
+        {
+            foreach ((int i, int j, double elevation) in corners)
+            {
+                double old = Land.GetCornerElevation(i, j);
+                Land.SetCornerElevation(i, j, elevation);
+                previous.Add((i, j, old));
+            }
+        }
+        catch (ArgumentException)
+        {
+            Revert();
+            throw;
+        }
+
+        RevertIfRoadInWater(Revert);
     }
 
     private void RevertIfRoadInWater(Action revert)

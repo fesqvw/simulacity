@@ -9,4 +9,9 @@
     <ProjectReference Include="..\..\src\Simulacity.Contracts\Simulacity.Contracts.csproj" />
     <ProjectReference Include="..\..\src\Simulacity.Transport.NamedPipes\Simulacity.Transport.NamedPipes.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Map scripts, such as the starting map (decision 0013), next to the program. -->
+    <None Include="..\..\maps\**\*.txt" Link="maps\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

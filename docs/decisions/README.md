@@ -18,7 +18,7 @@ Don't edit an accepted decision to change it. Write a new record and set the old
 | [0001](0001-record-decisions.md) | Record decisions in `docs/decisions/` | Accepted |
 | [0002](0002-start-over.md) | Start the project over from scratch | Accepted |
 | [0003](0003-csharp-dotnet.md) | Use C# and .NET | Accepted |
-| [0004](0004-console-front-end.md) | Console front end: a simulator that takes commands, and a separate renderer | Accepted |
+| [0004](0004-console-front-end.md) | Console front end: a simulator that takes commands, and a separate renderer | Superseded by 0014 |
 | [0005](0005-render-channel.md) | Send state to renderers through an interface, using named pipes first | Accepted |
 | [0006](0006-solution-layout.md) | Solution layout and target framework | Accepted |
 | [0007](0007-map-geometry.md) | Map and geometry: a road graph with polyline segments, and a land grid | Superseded by 0009 |
@@ -27,3 +27,5 @@ Don't edit an accepted decision to change it. Write a new record and set the old
 | [0010](0010-snapshot-contents.md) | Snapshots: the full drawable state, as JSON, after every change | Accepted |
 | [0011](0011-roads-meet-at-crossings.md) | Roads meet where they cross at the same height | Accepted |
 | [0012](0012-bridges-and-tunnels-from-height.md) | Water is crossed on bridges or in tunnels, worked out from height | Accepted |
+| [0013](0013-map-scripts.md) | Maps are command scripts, and the simulator starts with a starting map | Accepted |
+| [0014](0014-renderer-view-controls.md) | The renderer can move its view around the map | Accepted |

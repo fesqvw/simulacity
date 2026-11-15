@@ -135,4 +135,29 @@ public class RoadNetworkTests
         Assert.Throws<KeyNotFoundException>(() => _roads.SegmentsAt(new NodeId(1)));
         Assert.Throws<KeyNotFoundException>(() => _roads.PolylineOf(new SegmentId(1)));
     }
+
+    [Fact]
+    public void A_node_without_segments_can_be_removed_but_one_with_segments_cannot()
+    {
+        RoadNode a = _roads.AddNode(new Point3(0, 0, 0));
+        RoadNode b = _roads.AddNode(new Point3(100, 0, 0));
+        RoadNode lone = _roads.AddNode(new Point3(50, 50, 0));
+        _roads.AddSegment(a.Id, b.Id);
+
+        Assert.True(_roads.RemoveNode(lone.Id));
+        Assert.False(_roads.RemoveNode(lone.Id));
+        Assert.Throws<InvalidOperationException>(() => _roads.RemoveNode(a.Id));
+        Assert.Equal(2, _roads.Nodes.Count);
+    }
+
+    [Fact]
+    public void A_node_is_found_by_position_within_the_snap_distance_and_height_tolerance()
+    {
+        RoadNode node = _roads.AddNode(new Point3(10, 10, 2));
+
+        Assert.True(_roads.TryFindNode(new Point3(10.005, 10, 2.5), out RoadNode? found));
+        Assert.Equal(node, found);
+        Assert.False(_roads.TryFindNode(new Point3(10.5, 10, 2), out _));
+        Assert.False(_roads.TryFindNode(new Point3(10, 10, 8), out _)); // A bridge above it.
+    }
 }

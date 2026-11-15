@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Simulacity.Core.Geometry;
 
 namespace Simulacity.Core.Roads;
@@ -148,6 +149,51 @@ public sealed class RoadNetwork
         _segmentsAtNode[segment.Start].Remove(id);
         _segmentsAtNode[segment.End].Remove(id);
         return true;
+    }
+
+    /// <summary>
+    /// Removes a node that no segment uses. A node with segments has to keep them, so it can't be removed.
+    /// </summary>
+    /// <returns><see langword="true"/> if the node existed and was removed.</returns>
+    /// <exception cref="InvalidOperationException">Segments still start or end at the node.</exception>
+    public bool RemoveNode(NodeId id)
+    {
+        if (!_segmentsAtNode.TryGetValue(id, out List<SegmentId>? segments))
+        {
+            return false;
+        }
+
+        if (segments.Count > 0)
+        {
+            throw new InvalidOperationException($"Node {id} still has {segments.Count} segment(s), so it can't be removed.");
+        }
+
+        _segmentsAtNode.Remove(id);
+        _nodes.Remove(id);
+        return true;
+    }
+
+    /// <summary>
+    /// The node at a position: within <see cref="SnapDistance"/> of it in plan and within
+    /// <see cref="MeetingHeightTolerance"/> in height. If several are, the one with the lowest ID.
+    /// </summary>
+    /// <returns><see langword="true"/> and the node if there is one.</returns>
+    public bool TryFindNode(Point3 position, [NotNullWhen(true)] out RoadNode? node)
+    {
+        foreach (RoadNode candidate in _nodes.Values.OrderBy(candidate => candidate.Id.Value))
+        {
+            double dx = candidate.Position.X - position.X;
+            double dy = candidate.Position.Y - position.Y;
+            if ((dx * dx) + (dy * dy) <= SnapDistance * SnapDistance
+                && Math.Abs(candidate.Position.Z - position.Z) <= MeetingHeightTolerance)
+            {
+                node = candidate;
+                return true;
+            }
+        }
+
+        node = null;
+        return false;
     }
 
     /// <summary>Whether the graph has a node with the given ID.</summary>

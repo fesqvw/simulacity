@@ -1,6 +1,6 @@
 # 0004. Console front end: a simulator that takes commands, and a separate renderer
 
-- **Status:** Accepted
+- **Status:** Superseded by [0014](0014-renderer-view-controls.md)
 - **Date:** 2026-11-14
 - **Amended:** 2026-11-14, to settle which program runs the simulation (formerly an open question)
 

@@ -152,7 +152,7 @@ public class CommandInterpreterTests
     [Theory]
     [InlineData("road", "Usage: road")]
     [InlineData("road n1", "Usage: road")]
-    [InlineData("road x1 n2", "Usage: road")]
+    [InlineData("road x1 n2", "isn't a node or a point")]
     [InlineData("road n1 n9", "There is no node n9")]
     [InlineData("road n1 n1", "two different nodes")]
     [InlineData("road n1 n2 5", "isn't a point")]
@@ -341,18 +341,5 @@ public class CommandInterpreterTests
 
         Assert.Contains(expected, result.Output);
         Assert.Empty(_publisher.Published);
-    }
-
-    private sealed class RecordingPublisher : IStatePublisher
-    {
-        public List<SimulationSnapshot> Published { get; } = [];
-
-        public Task PublishAsync(SimulationSnapshot snapshot, CancellationToken cancellationToken = default)
-        {
-            Published.Add(snapshot);
-            return Task.CompletedTask;
-        }
-
-        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
     }
 }
