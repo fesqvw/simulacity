@@ -134,7 +134,17 @@ public class NamedPipeChannelTests
             new LandSnapshot(2, 1, 10, [LandKind.Ground, LandKind.Water], [0, 1.5, 3, 0, -2, 4]),
             new RoadsSnapshot(
                 [new RoadNodeSnapshot(1, new Position(0, 5, 0)), new RoadNodeSnapshot(2, new Position(20, 5, 3))],
-                [new RoadSegmentSnapshot(7, 1, 2, [new Position(0, 5, 0), new Position(10, 5, 6.25), new Position(20, 5, 3)])]));
+                [
+                    new RoadSegmentSnapshot(
+                        7,
+                        1,
+                        2,
+                        [new Position(0, 5, 0), new Position(10, 5, 6.25), new Position(20, 5, 3)],
+                        [
+                            new RoadStretchSnapshot(RoadLevelKind.Ground, [new Position(0, 5, 0), new Position(4, 5, 2.5)]),
+                            new RoadStretchSnapshot(RoadLevelKind.Bridge, [new Position(4, 5, 2.5), new Position(10, 5, 6.25), new Position(20, 5, 3)]),
+                        ]),
+                ]));
 
     private static async Task<SimulationSnapshot> NextAsync(IAsyncEnumerator<SimulationSnapshot> snapshots)
     {

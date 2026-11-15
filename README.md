@@ -74,7 +74,7 @@ road n1 n2 290,160,8 350,160,8
 roads
 ```
 
-This turns a column of cells (300–340 m from the west edge) into water, adds a node on the ground on each bank, and joins them with a road that rises to an 8 m deck over the water.
+This turns a column of cells (300–340 m from the west edge) into water, adds a node on the ground on each bank, and joins them with a road that rises to an 8 m deck over the water. A road can't cross water at ground level, so a plain `road n1 n2` would be refused. Where a road is more than 1 m above the ground or water it becomes a bridge, and more than 1 m below it a tunnel, with no extra command ([decision 0012](docs/decisions/0012-bridges-and-tunnels-from-height.md)).
 
 Roads that cross at the same height are joined at a new junction node, and the roads they cross are split there ([decision 0011](docs/decisions/0011-roads-meet-at-crossings.md)). A road that passes more than 1 m above or below another, like the bridge above, doesn't meet it. Continuing the example, this adds two roads on the ground west of the river that cross at a new junction, `n7`:
 

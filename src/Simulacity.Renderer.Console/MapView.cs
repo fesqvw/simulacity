@@ -9,8 +9,8 @@ namespace Simulacity.Renderer.Console;
 /// <para>The map is scaled to fit the space it's given. Console characters are about twice as tall as
 /// they are wide, so each character covers half as many metres across as it does down, which keeps
 /// distances in proportion.</para>
-/// <para>Heights can't be shown top-down. Roads are marked as bridges where they run above the ground
-/// and as tunnels where they run below it, and where roads overlap the one on top wins.</para>
+/// <para>Heights can't be shown top-down. The simulator says which stretches of road are bridges and
+/// tunnels (decision 0012), and where roads overlap the one on top wins.</para>
 /// </remarks>
 public static class MapView
 {
@@ -35,9 +35,6 @@ public static class MapView
     /// <summary>The key to the characters, to print under the map.</summary>
     public const string Legend = ". ground   ~ water   # road   = bridge   : tunnel   o node";
 
-    /// <summary>How far above or below the ground a road has to be to count as a bridge or a tunnel, in metres.</summary>
-    public const double GradeTolerance = 1;
-
     // Lowest to highest priority: what's drawn later only replaces what's drawn earlier if it ranks higher.
     private const int LandLayer = 0;
     private const int TunnelLayer = 1;
@@ -57,7 +54,10 @@ public static class MapView
         canvas.DrawLand();
         foreach (RoadSegmentSnapshot segment in snapshot.Roads.Segments)
         {
-            canvas.DrawRoad(segment.Points);
+            foreach (RoadStretchSnapshot stretch in segment.Stretches)
+            {
+                canvas.DrawStretch(stretch);
+            }
         }
 
         foreach (RoadNodeSnapshot node in snapshot.Roads.Nodes)
@@ -66,30 +66,6 @@ public static class MapView
         }
 
         return canvas.Rows();
-    }
-
-    /// <summary>The ground elevation under a position, interpolated between the corners of its cell.</summary>
-    /// <returns>The elevation, or null if the position is off the map.</returns>
-    public static double? GroundElevation(LandSnapshot land, double x, double y)
-    {
-        ArgumentNullException.ThrowIfNull(land);
-
-        double u = x / land.CellSize;
-        double v = y / land.CellSize;
-        if (!(u >= 0 && u <= land.Width && v >= 0 && v <= land.Height))
-        {
-            return null;
-        }
-
-        int i = Math.Min((int)u, land.Width - 1);
-        int j = Math.Min((int)v, land.Height - 1);
-        double fx = u - i;
-        double fy = v - j;
-        double Corner(int ci, int cj) => land.CornerElevations[(cj * (land.Width + 1)) + ci];
-
-        double south = Lerp(Corner(i, j), Corner(i + 1, j), fx);
-        double north = Lerp(Corner(i, j + 1), Corner(i + 1, j + 1), fx);
-        return Lerp(south, north, fy);
     }
 
     private static double Lerp(double a, double b, double t) => a + ((b - a) * t);
@@ -137,16 +113,23 @@ public static class MapView
             }
         }
 
-        public void DrawRoad(IReadOnlyList<Position> points)
+        public void DrawStretch(RoadStretchSnapshot stretch)
         {
-            for (int i = 1; i < points.Count; i++)
+            (char symbol, int layer) = stretch.Level switch
             {
-                DrawLine(points[i - 1], points[i]);
+                RoadLevelKind.Bridge => (Bridge, BridgeLayer),
+                RoadLevelKind.Tunnel => (Tunnel, TunnelLayer),
+                _ => (Road, RoadLayer),
+            };
+
+            for (int i = 1; i < stretch.Points.Count; i++)
+            {
+                DrawLine(stretch.Points[i - 1], stretch.Points[i], symbol, layer);
             }
         }
 
         /// <summary>Draws a straight piece of road, one step per character it crosses.</summary>
-        private void DrawLine(Position from, Position to)
+        private void DrawLine(Position from, Position to, char symbol, int layer)
         {
             double columnsAcross = Math.Abs(to.X - from.X) / _metresPerColumn;
             double rowsAcross = Math.Abs(to.Y - from.Y) / _metresPerRow;
@@ -154,28 +137,8 @@ public static class MapView
             for (int step = 0; step <= steps; step++)
             {
                 double t = (double)step / steps;
-                double x = Lerp(from.X, to.X, t);
-                double y = Lerp(from.Y, to.Y, t);
-                double z = Lerp(from.Z, to.Z, t);
-                (char symbol, int layer) = RoadSymbol(x, y, z);
-                Plot(x, y, symbol, layer);
+                Plot(Lerp(from.X, to.X, t), Lerp(from.Y, to.Y, t), symbol, layer);
             }
-        }
-
-        /// <summary>Whether a point of road is on the ground, above it or below it.</summary>
-        private (char Symbol, int Layer) RoadSymbol(double x, double y, double z)
-        {
-            if (GroundElevation(_land, x, y) is not double ground)
-            {
-                return (Road, RoadLayer); // Off the map, where it isn't drawn anyway.
-            }
-
-            if (z > ground + GradeTolerance)
-            {
-                return (Bridge, BridgeLayer);
-            }
-
-            return z < ground - GradeTolerance ? (Tunnel, TunnelLayer) : (Road, RoadLayer);
         }
 
         public void Plot(double x, double y, char symbol, int layer)

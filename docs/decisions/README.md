@@ -26,3 +26,4 @@ Don't edit an accepted decision to change it. Write a new record and set the old
 | [0009](0009-3d-world.md) | A 3D world, so roads can cross on bridges and in tunnels | Accepted |
 | [0010](0010-snapshot-contents.md) | Snapshots: the full drawable state, as JSON, after every change | Accepted |
 | [0011](0011-roads-meet-at-crossings.md) | Roads meet where they cross at the same height | Accepted |
+| [0012](0012-bridges-and-tunnels-from-height.md) | Water is crossed on bridges or in tunnels, worked out from height | Accepted |

@@ -37,6 +37,8 @@ public sealed class CommandInterpreter(Simulation simulation, IStatePublisher pu
           help                         show this list
           quit                         exit the simulator
 
+        Water can only be crossed on a bridge or in a tunnel: a road more than 1 m above
+        or below the ground or water. Roads become bridges and tunnels by their height.
         Nodes are written n1, n2…, and segments s1, s2… (the letter is optional).
         Land cells and corners are counted from 0 at the south-west corner of the map.
         """;
@@ -184,7 +186,7 @@ public sealed class CommandInterpreter(Simulation simulation, IStatePublisher pu
         RoadAddition addition;
         try
         {
-            addition = World.Roads.AddRoad(start, end, new PolylineShape(points));
+            addition = World.AddRoad(start, end, new PolylineShape(points));
         }
         catch (ArgumentException exception)
         {
@@ -278,15 +280,17 @@ public sealed class CommandInterpreter(Simulation simulation, IStatePublisher pu
             return ($"The map's cells go from (0, 0) to ({land.Width - 1}, {land.Height - 1}).", false);
         }
 
+        try
+        {
+            World.SetLand(x1, y1, x2, y2, type);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return (exception.Message, false);
+        }
+
         (int west, int east) = (Math.Min(x1, x2), Math.Max(x1, x2));
         (int south, int north) = (Math.Min(y1, y2), Math.Max(y1, y2));
-        for (int y = south; y <= north; y++)
-        {
-            for (int x = west; x <= east; x++)
-            {
-                land[x, y] = type;
-            }
-        }
 
         int count = (east - west + 1) * (north - south + 1);
         string name = type.ToString().ToLowerInvariant();
@@ -311,7 +315,15 @@ public sealed class CommandInterpreter(Simulation simulation, IStatePublisher pu
             return ($"The map's corners go from (0, 0) to ({land.Width}, {land.Height}).", false);
         }
 
-        land.SetCornerElevation(i, j, z);
+        try
+        {
+            World.SetCornerElevation(i, j, z);
+        }
+        catch (InvalidOperationException exception)
+        {
+            return (exception.Message, false);
+        }
+
         return ($"Set the ground height at corner ({i}, {j}) to {Format(z)} m.", true);
     }
 

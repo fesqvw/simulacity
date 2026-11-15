@@ -206,6 +206,38 @@ public class CommandInterpreterTests
     }
 
     [Fact]
+    public async Task Road_across_water_at_ground_level_is_refused_but_a_bridge_is_built()
+    {
+        foreach (string line in (string[])["land water 2 0 2 3", "node 5 15", "node 35 15"])
+        {
+            await _interpreter.ExecuteAsync(line);
+        }
+
+        CommandResult ford = await _interpreter.ExecuteAsync("road n1 n2");
+        CommandResult bridge = await _interpreter.ExecuteAsync("road n1 n2 18,15,5 32,15,5");
+
+        Assert.Contains("water at ground level", ford.Output);
+        Assert.StartsWith("Added road s1", bridge.Output);
+        Assert.Single(_simulation.World.Roads.Segments);
+        Assert.Equal(4, _publisher.Published.Count);
+    }
+
+    [Fact]
+    public async Task Land_and_height_changes_that_would_flood_a_road_are_refused()
+    {
+        foreach (string line in (string[])["node 5 15", "node 35 15", "road n1 n2"])
+        {
+            await _interpreter.ExecuteAsync(line);
+        }
+
+        CommandResult land = await _interpreter.ExecuteAsync("land water 2 0 2 3");
+
+        Assert.Contains("Road s1 would then run at ground level through water", land.Output);
+        Assert.Equal(LandType.Ground, _simulation.World.Land[2, 1]);
+        Assert.Equal(3, _publisher.Published.Count);
+    }
+
+    [Fact]
     public async Task Remove_deletes_a_road_but_keeps_its_nodes()
     {
         await _interpreter.ExecuteAsync("node 0 0");

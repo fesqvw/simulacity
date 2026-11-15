@@ -47,11 +47,11 @@ See [decision 0006](docs/decisions/0006-solution-layout.md) for the full rationa
 - `src/Simulacity.Renderer.Console`: the renderer console app. Must never reference `Simulacity.Core`. `MapView` draws a snapshot as text.
 - `tests/Simulacity.Tests`: xUnit tests.
 
-Add roads with `RoadNetwork.AddRoad`, which joins them to roads they cross at the same height ([decision 0011](docs/decisions/0011-roads-meet-at-crossings.md)). `AddSegment` adds a segment exactly as given, without looking for crossings.
+Change the world through `World.AddRoad`, `World.SetLand` and `World.SetCornerElevation`. They keep the rules: roads join where they cross at the same height ([decision 0011](docs/decisions/0011-roads-meet-at-crossings.md)), and water is only crossed on bridges or in tunnels, which are worked out from height and never stored ([decision 0012](docs/decisions/0012-bridges-and-tunnels-from-height.md)). `RoadNetwork.AddSegment` and the `LandGrid` setters skip those rules.
 
 Shared build settings (`net10.0`, nullable, warnings as errors) are in `Directory.Build.props`. Don't repeat them in project files.
 
-A `SimulationSnapshot` is the full drawable state of the world (land, terrain heights, and roads as polylines), sent as length-prefixed JSON after every change ([decision 0010](docs/decisions/0010-snapshot-contents.md)). The simulator builds it in `SnapshotBuilder`. Renderers must be able to draw from any single snapshot.
+A `SimulationSnapshot` is the full drawable state of the world (land, terrain heights, and roads as polylines split into ground, bridge and tunnel stretches), sent as length-prefixed JSON after every change ([decision 0010](docs/decisions/0010-snapshot-contents.md)). The simulator builds it in `SnapshotBuilder`. Renderers must be able to draw from any single snapshot.
 
 ## Commands
 
