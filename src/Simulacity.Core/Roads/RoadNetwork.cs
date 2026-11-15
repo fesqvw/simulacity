@@ -67,6 +67,12 @@ public sealed class RoadNetwork
         return true;
     }
 
+    /// <summary>Whether the graph has a node with the given ID.</summary>
+    public bool ContainsNode(NodeId id) => _nodes.ContainsKey(id);
+
+    /// <summary>Whether the graph has a segment with the given ID.</summary>
+    public bool ContainsSegment(SegmentId id) => _segments.ContainsKey(id);
+
     /// <summary>The node with the given ID.</summary>
     /// <exception cref="KeyNotFoundException">There is no such node.</exception>
     public RoadNode GetNode(NodeId id) =>

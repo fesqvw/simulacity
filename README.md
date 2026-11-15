@@ -64,6 +64,18 @@ dotnet run --project src/Simulacity.Renderer.Console
 
 You can start them in either order. The renderer waits for the simulator, and reconnects if the simulator restarts.
 
+The simulator starts with a flat 640 m × 320 m map of ground. For example, to dig a river and build a road across it on a bridge:
+
+```text
+land water 30 0 33 31
+node 200 160
+node 440 160
+road n1 n2 290,160,8 350,160,8
+roads
+```
+
+This turns a column of cells (300–340 m from the west edge) into water, adds a node on the ground on each bank, and joins them with a road that rises to an 8 m deck over the water. `help` lists every command. The renderer doesn't draw the map yet.
+
 ## Project layout
 
 | Path | What it is |
