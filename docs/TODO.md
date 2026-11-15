@@ -20,8 +20,9 @@
 - [x] Simulator commands to add roads, paint land and set terrain height (`node`, `road`, `remove`, `roads`, `land`, `height`)
 - [x] Land grid and road graph (intersections and polyline segments) in `Simulacity.Core`, owned by `World`
 - [x] Make the world 3D: z elevation on every point, and a terrain heightmap on the land grid ([0009](decisions/0009-3d-world.md))
+- [ ] Decide what happens when a road runs over water at ground level: forbid it, or let it be a ford. Today it is allowed and drawn as a normal road
 - [ ] Split segments where a new road crosses an existing one at the same height (segment intersection, then a spatial index). Roads at different heights pass over or under each other
-- [ ] Render the map: draw the land and the road polylines from the snapshot (the renderer only prints a summary so far)
+- [x] Render the map: land, roads, bridges, tunnels and nodes, top-down and scaled to fit the console (`MapView`)
 
 ## Later
 

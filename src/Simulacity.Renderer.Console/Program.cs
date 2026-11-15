@@ -1,4 +1,5 @@
 using Simulacity.Contracts;
+using Simulacity.Renderer.Console;
 using Simulacity.Transport.NamedPipes;
 
 // The console renderer: only draws the state the simulator sends it. It never runs the simulation,
@@ -28,17 +29,28 @@ try
     await foreach (SimulationSnapshot snapshot in receiver.ReceiveAsync(exit.Token))
     {
         LandSnapshot land = snapshot.Land;
-        int water = land.Cells.Count(cell => cell == LandKind.Water);
-        Draw(
-            $"""
-            Tick {snapshot.Tick}
-            Map: {land.Width} × {land.Height} cells of {land.CellSize} m, {water} of them water
-            Road nodes: {snapshot.Roads.Nodes.Count}, road segments: {snapshot.Roads.Segments.Count}
-            """);
+        (int columns, int rows) = MapSpace();
+        string info =
+            $"Tick {snapshot.Tick}   Map {land.Width} × {land.Height} cells of {land.CellSize} m   "
+            + $"Roads: {snapshot.Roads.Nodes.Count} nodes, {snapshot.Roads.Segments.Count} segments";
+        IReadOnlyList<string> map = MapView.Draw(snapshot, columns, rows);
+        Draw(string.Join(Environment.NewLine, [info, string.Empty, .. map, string.Empty, MapView.Legend]));
     }
 }
 catch (OperationCanceledException) when (exit.IsCancellationRequested)
 {
+}
+
+// The space left for the map once the title, the info line, the legend and the blank lines between them are drawn.
+static (int Columns, int Rows) MapSpace()
+{
+    const int linesAroundMap = 7;
+    if (Console.IsOutputRedirected)
+    {
+        return (120, 40);
+    }
+
+    return (Math.Max(Console.WindowWidth - 1, 2), Math.Max(Console.WindowHeight - linesAroundMap, 1));
 }
 
 static void Draw(string text)

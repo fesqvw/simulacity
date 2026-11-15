@@ -2,6 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-11-14
+- **Amended:** 2026-11-15, so the tests also reference the renderer, to test how it draws the map
 
 ## Context
 
@@ -24,7 +25,7 @@ One solution, `Simulacity.slnx`, with these projects:
 | `src/Simulacity.Transport.NamedPipes` | Class library | Contracts | Named-pipe implementations of the Contracts interfaces |
 | `src/Simulacity.Simulator` | Console app | Core, Contracts, Transport.NamedPipes | Reads commands, runs the simulation, publishes state |
 | `src/Simulacity.Renderer.Console` | Console app | Contracts, Transport.NamedPipes | Draws the state it receives |
-| `tests/Simulacity.Tests` | xUnit tests | all of the above except the renderer | Tests |
+| `tests/Simulacity.Tests` | xUnit tests | all of the above | Tests |
 
 `Simulacity.Core` and `Simulacity.Contracts` don't reference each other. The simulator maps the simulation's state onto the snapshot it publishes. The renderer never references `Simulacity.Core`, so it can't run simulation logic even by accident.
 
