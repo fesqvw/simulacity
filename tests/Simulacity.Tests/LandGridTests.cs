@@ -68,7 +68,7 @@ public class LandGridTests
     {
         var grid = new LandGrid(3, 2, 10);
 
-        Assert.True(grid.TryGetCell(new Point2(px, py), out int x, out int y));
+        Assert.True(grid.TryGetCell(new Point3(px, py, 0), out int x, out int y));
         Assert.Equal((expectedX, expectedY), (x, y));
     }
 
@@ -82,6 +82,89 @@ public class LandGridTests
     {
         var grid = new LandGrid(3, 2, 10);
 
-        Assert.False(grid.TryGetCell(new Point2(px, py), out _, out _));
+        Assert.False(grid.TryGetCell(new Point3(px, py, 0), out _, out _));
+    }
+
+    [Fact]
+    public void A_position_elevation_does_not_change_its_cell()
+    {
+        var grid = new LandGrid(3, 2, 10);
+
+        Assert.True(grid.TryGetCell(new Point3(15, 5, -30), out int x, out int y));
+        Assert.Equal((1, 0), (x, y));
+    }
+
+    [Fact]
+    public void A_new_grid_is_flat_at_the_given_elevation()
+    {
+        var grid = new LandGrid(2, 2, 10, elevation: 12.5);
+
+        Assert.Equal(12.5, grid.GetCornerElevation(0, 0));
+        Assert.Equal(12.5, grid.GetCornerElevation(2, 2));
+        Assert.True(grid.TryGetGroundElevation(new Point3(7, 13, 0), out double elevation));
+        Assert.Equal(12.5, elevation, precision: 9);
+    }
+
+    [Theory]
+    [InlineData(0, 0, 0)]
+    [InlineData(10, 0, 10)]
+    [InlineData(5, 0, 5)]
+    [InlineData(0, 10, 20)]
+    [InlineData(10, 10, 30)]
+    [InlineData(5, 5, 15)]
+    [InlineData(2.5, 7.5, 17.5)]
+    public void Ground_elevation_is_interpolated_bilinearly_within_a_cell(double px, double py, double expected)
+    {
+        var grid = new LandGrid(1, 1, 10);
+        grid.SetCornerElevation(1, 0, 10);
+        grid.SetCornerElevation(0, 1, 20);
+        grid.SetCornerElevation(1, 1, 30);
+
+        Assert.True(grid.TryGetGroundElevation(new Point3(px, py, 0), out double elevation));
+        Assert.Equal(expected, elevation, precision: 9);
+    }
+
+    [Fact]
+    public void Ground_elevation_is_defined_on_the_far_edges_of_the_grid()
+    {
+        var grid = new LandGrid(2, 2, 10);
+        grid.SetCornerElevation(2, 2, 8);
+
+        Assert.True(grid.TryGetGroundElevation(new Point3(20, 20, 0), out double elevation));
+        Assert.Equal(8, elevation, precision: 9);
+    }
+
+    [Theory]
+    [InlineData(-0.1, 0)]
+    [InlineData(20.1, 0)]
+    [InlineData(0, 20.1)]
+    [InlineData(double.NaN, 0)]
+    public void A_position_off_the_grid_has_no_ground_elevation(double px, double py)
+    {
+        var grid = new LandGrid(2, 2, 10);
+
+        Assert.False(grid.TryGetGroundElevation(new Point3(px, py, 0), out _));
+    }
+
+    [Theory]
+    [InlineData(-1, 0)]
+    [InlineData(0, -1)]
+    [InlineData(3, 0)]
+    [InlineData(0, 3)]
+    public void Corners_outside_the_grid_are_rejected(int i, int j)
+    {
+        var grid = new LandGrid(2, 2, 10);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => grid.GetCornerElevation(i, j));
+        Assert.Throws<ArgumentOutOfRangeException>(() => grid.SetCornerElevation(i, j, 1));
+    }
+
+    [Fact]
+    public void Elevations_must_be_finite()
+    {
+        var grid = new LandGrid(2, 2, 10);
+
+        Assert.Throws<ArgumentException>(() => grid.SetCornerElevation(0, 0, double.NaN));
+        Assert.Throws<ArgumentException>(() => new LandGrid(2, 2, 10, elevation: double.PositiveInfinity));
     }
 }

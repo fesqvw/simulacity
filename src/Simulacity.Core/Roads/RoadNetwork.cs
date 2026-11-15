@@ -3,7 +3,7 @@ using Simulacity.Core.Geometry;
 namespace Simulacity.Core.Roads;
 
 /// <summary>
-/// The road graph: nodes (intersections and dead ends) joined by segments (decision 0007).
+/// The road graph: nodes (intersections and dead ends) joined by segments (decision 0009).
 /// </summary>
 public sealed class RoadNetwork
 {
@@ -20,7 +20,7 @@ public sealed class RoadNetwork
     public IReadOnlyCollection<RoadSegment> Segments => _segments.Values;
 
     /// <summary>Adds a node at a world position.</summary>
-    public RoadNode AddNode(Point2 position)
+    public RoadNode AddNode(Point3 position)
     {
         if (!position.IsFinite)
         {
@@ -84,7 +84,7 @@ public sealed class RoadNetwork
 
     /// <summary>A segment's shape as a polyline from its start node to its end node.</summary>
     /// <exception cref="KeyNotFoundException">There is no such segment.</exception>
-    public IReadOnlyList<Point2> PolylineOf(SegmentId id)
+    public IReadOnlyList<Point3> PolylineOf(SegmentId id)
     {
         RoadSegment segment = GetSegment(id);
         return segment.Shape.ToPolyline(_nodes[segment.Start].Position, _nodes[segment.End].Position);

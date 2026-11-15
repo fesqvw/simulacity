@@ -1,6 +1,6 @@
 # 0007. Map and geometry: a road graph with polyline segments, and a land grid
 
-- **Status:** Accepted
+- **Status:** Superseded by [0009](0009-3d-world.md)
 - **Date:** 2026-11-15
 
 ## Context

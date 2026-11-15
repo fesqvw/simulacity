@@ -10,19 +10,19 @@ public class RoadNetworkTests
     [Fact]
     public void Nodes_get_distinct_ids_and_keep_their_position()
     {
-        RoadNode a = _roads.AddNode(new Point2(0, 0));
-        RoadNode b = _roads.AddNode(new Point2(100, 50));
+        RoadNode a = _roads.AddNode(new Point3(0, 0, 0));
+        RoadNode b = _roads.AddNode(new Point3(100, 50, 0));
 
         Assert.NotEqual(a.Id, b.Id);
-        Assert.Equal(new Point2(100, 50), _roads.GetNode(b.Id).Position);
+        Assert.Equal(new Point3(100, 50, 0), _roads.GetNode(b.Id).Position);
         Assert.Equal(2, _roads.Nodes.Count);
     }
 
     [Fact]
     public void A_segment_joins_two_nodes_and_is_listed_at_both()
     {
-        RoadNode a = _roads.AddNode(new Point2(0, 0));
-        RoadNode b = _roads.AddNode(new Point2(100, 0));
+        RoadNode a = _roads.AddNode(new Point3(0, 0, 0));
+        RoadNode b = _roads.AddNode(new Point3(100, 0, 0));
 
         RoadSegment segment = _roads.AddSegment(a.Id, b.Id);
 
@@ -34,31 +34,31 @@ public class RoadNetworkTests
     [Fact]
     public void A_segment_without_a_shape_is_a_straight_line()
     {
-        RoadNode a = _roads.AddNode(new Point2(0, 0));
-        RoadNode b = _roads.AddNode(new Point2(30, 40));
+        RoadNode a = _roads.AddNode(new Point3(0, 0, 0));
+        RoadNode b = _roads.AddNode(new Point3(30, 40, 0));
 
         RoadSegment segment = _roads.AddSegment(a.Id, b.Id);
 
-        Assert.Equal([new Point2(0, 0), new Point2(30, 40)], _roads.PolylineOf(segment.Id));
+        Assert.Equal([new Point3(0, 0, 0), new Point3(30, 40, 0)], _roads.PolylineOf(segment.Id));
         Assert.Equal(50, _roads.LengthOf(segment.Id), precision: 9);
     }
 
     [Fact]
     public void A_polyline_segment_runs_from_its_start_node_through_its_points_to_its_end_node()
     {
-        RoadNode a = _roads.AddNode(new Point2(0, 0));
-        RoadNode b = _roads.AddNode(new Point2(100, 100));
+        RoadNode a = _roads.AddNode(new Point3(0, 0, 0));
+        RoadNode b = _roads.AddNode(new Point3(100, 100, 0));
 
-        RoadSegment segment = _roads.AddSegment(a.Id, b.Id, new PolylineShape([new Point2(100, 0)]));
+        RoadSegment segment = _roads.AddSegment(a.Id, b.Id, new PolylineShape([new Point3(100, 0, 0)]));
 
-        Assert.Equal([new Point2(0, 0), new Point2(100, 0), new Point2(100, 100)], _roads.PolylineOf(segment.Id));
+        Assert.Equal([new Point3(0, 0, 0), new Point3(100, 0, 0), new Point3(100, 100, 0)], _roads.PolylineOf(segment.Id));
         Assert.Equal(200, _roads.LengthOf(segment.Id), precision: 9);
     }
 
     [Fact]
     public void A_segment_needs_two_existing_different_nodes()
     {
-        RoadNode a = _roads.AddNode(new Point2(0, 0));
+        RoadNode a = _roads.AddNode(new Point3(0, 0, 0));
 
         Assert.Throws<ArgumentException>(() => _roads.AddSegment(a.Id, a.Id));
         Assert.Throws<ArgumentException>(() => _roads.AddSegment(a.Id, new NodeId(999)));
@@ -69,15 +69,41 @@ public class RoadNetworkTests
     [Fact]
     public void Positions_and_points_must_be_finite()
     {
-        Assert.Throws<ArgumentException>(() => _roads.AddNode(new Point2(double.NaN, 0)));
-        Assert.Throws<ArgumentException>(() => new PolylineShape([new Point2(0, double.PositiveInfinity)]));
+        Assert.Throws<ArgumentException>(() => _roads.AddNode(new Point3(double.NaN, 0, 0)));
+        Assert.Throws<ArgumentException>(() => new PolylineShape([new Point3(0, double.PositiveInfinity, 0)]));
+        Assert.Throws<ArgumentException>(() => _roads.AddNode(new Point3(0, 0, double.NaN)));
+    }
+
+    [Fact]
+    public void Segment_length_includes_the_climb()
+    {
+        RoadNode a = _roads.AddNode(new Point3(0, 0, 0));
+        RoadNode b = _roads.AddNode(new Point3(30, 0, 40));
+
+        RoadSegment segment = _roads.AddSegment(a.Id, b.Id);
+
+        Assert.Equal(50, _roads.LengthOf(segment.Id), precision: 9);
+    }
+
+    [Fact]
+    public void A_bridge_is_a_segment_whose_points_rise_above_the_ground()
+    {
+        RoadNode west = _roads.AddNode(new Point3(0, 50, 0));
+        RoadNode east = _roads.AddNode(new Point3(100, 50, 0));
+        var deck = new PolylineShape([new Point3(20, 50, 8), new Point3(80, 50, 8)]);
+
+        RoadSegment bridge = _roads.AddSegment(west.Id, east.Id, deck);
+
+        Assert.Equal(
+            [new Point3(0, 50, 0), new Point3(20, 50, 8), new Point3(80, 50, 8), new Point3(100, 50, 0)],
+            _roads.PolylineOf(bridge.Id));
     }
 
     [Fact]
     public void Removing_a_segment_keeps_its_nodes()
     {
-        RoadNode a = _roads.AddNode(new Point2(0, 0));
-        RoadNode b = _roads.AddNode(new Point2(100, 0));
+        RoadNode a = _roads.AddNode(new Point3(0, 0, 0));
+        RoadNode b = _roads.AddNode(new Point3(100, 0, 0));
         RoadSegment segment = _roads.AddSegment(a.Id, b.Id);
 
         Assert.True(_roads.RemoveSegment(segment.Id));
@@ -92,8 +118,8 @@ public class RoadNetworkTests
     [Fact]
     public void Ids_are_not_reused_after_a_removal()
     {
-        RoadNode a = _roads.AddNode(new Point2(0, 0));
-        RoadNode b = _roads.AddNode(new Point2(100, 0));
+        RoadNode a = _roads.AddNode(new Point3(0, 0, 0));
+        RoadNode b = _roads.AddNode(new Point3(100, 0, 0));
         RoadSegment first = _roads.AddSegment(a.Id, b.Id);
         _roads.RemoveSegment(first.Id);
 

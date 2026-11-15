@@ -4,7 +4,7 @@ namespace Simulacity.Core.Geometry;
 public static class Polyline
 {
     /// <summary>The total length of the polyline, in metres. Zero for fewer than two points.</summary>
-    public static double Length(IReadOnlyList<Point2> points)
+    public static double Length(IReadOnlyList<Point3> points)
     {
         ArgumentNullException.ThrowIfNull(points);
 
