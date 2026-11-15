@@ -31,5 +31,5 @@ The simulator and the renderer are separate processes, and data flows only from 
 
 ## Still open
 
-- **What gets sent, and in what format.** For example, full snapshots or only the changes, as JSON or a binary format. To be decided once work on the simulation model has started.
+- ~~**What gets sent, and in what format.**~~ Settled by [0010](0010-snapshot-contents.md): full snapshots of the drawable state, as JSON.
 - **The interface's exact shape and name.** Settled when the code is written.

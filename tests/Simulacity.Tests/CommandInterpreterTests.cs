@@ -22,7 +22,7 @@ public class CommandInterpreterTests
 
         Assert.Equal(1, _simulation.Tick);
         Assert.Equal("Tick 1", result.Output);
-        Assert.Equal([new SimulationSnapshot(1)], _publisher.Published);
+        Assert.Equal(1, Assert.Single(_publisher.Published).Tick);
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public class CommandInterpreterTests
         await _interpreter.ExecuteAsync("  STEP   5 ");
 
         Assert.Equal(5, _simulation.Tick);
-        Assert.Equal([new SimulationSnapshot(5)], _publisher.Published);
+        Assert.Equal(5, Assert.Single(_publisher.Published).Tick);
     }
 
     [Theory]

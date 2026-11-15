@@ -27,7 +27,14 @@ try
 {
     await foreach (SimulationSnapshot snapshot in receiver.ReceiveAsync(exit.Token))
     {
-        Draw($"Tick {snapshot.Tick}");
+        LandSnapshot land = snapshot.Land;
+        int water = land.Cells.Count(cell => cell == LandKind.Water);
+        Draw(
+            $"""
+            Tick {snapshot.Tick}
+            Map: {land.Width} × {land.Height} cells of {land.CellSize} m, {water} of them water
+            Road nodes: {snapshot.Roads.Nodes.Count}, road segments: {snapshot.Roads.Segments.Count}
+            """);
     }
 }
 catch (OperationCanceledException) when (exit.IsCancellationRequested)
