@@ -9,7 +9,7 @@ Simulacity is a city simulation (transport, buildings, land, optionally utilitie
 It's written in **C# / .NET**, with a Godot front end planned for later ([decision 0003](docs/decisions/0003-csharp-dotnet.md)). Keep the simulation core free of any Godot or rendering dependency, so a Godot project can reference it. The first front end is two console apps ([decision 0014](docs/decisions/0014-renderer-view-controls.md), which supersedes 0004):
 
 - **The simulator** reads commands, owns and runs the simulation, and is the only thing that changes its state.
-- **The renderer** only draws the state the simulator sends it. It never runs simulation logic or changes the simulation. Its only state of its own is its view (which part of the map is on screen, and the scale), moved with WASD/arrows, `+`/`-` and `F`.
+- **The renderer** only draws the state the simulator sends it. It never runs simulation logic or changes the simulation. Its only state of its own is its view (which part of the map is on screen, and the scale), moved with WASD/arrows, `+`/`-` and `F`, and whether height colours are on (`H`, [decision 0015](docs/decisions/0015-height-as-colour.md)).
 
 The simulator sends state through an interface, never by calling a transport directly ([decision 0005](docs/decisions/0005-render-channel.md)). The first implementation uses named pipes, and Godot will use the same interface later. The renderer is started by hand, so either program can start first: the simulator must run fine with no renderer connected, and the renderer must wait for the simulator if it isn't running yet. Keep the interface in a shared library that has no Godot or transport dependency.
 
@@ -44,7 +44,7 @@ See [decision 0006](docs/decisions/0006-solution-layout.md) for the full rationa
 - `src/Simulacity.Contracts`: `IStatePublisher`, `IStateReceiver` and `SimulationSnapshot`. Also free of Godot and transport dependencies.
 - `src/Simulacity.Transport.NamedPipes`: the named-pipe implementations of the Contracts interfaces.
 - `src/Simulacity.Simulator`: the simulator console app. `CommandInterpreter` holds the commands.
-- `src/Simulacity.Renderer.Console`: the renderer console app. Must never reference `Simulacity.Core`. `MapView` draws a snapshot as text, through a `MapViewport`.
+- `src/Simulacity.Renderer.Console`: the renderer console app. Must never reference `Simulacity.Core`. `MapView` draws a snapshot as text, through a `MapViewport`, and `HeightShading` colours it by height.
 - `tests/Simulacity.Tests`: xUnit tests.
 - `maps`: map scripts, copied next to the simulator. `maps/starter.txt` is the starting map the simulator loads ([decision 0013](docs/decisions/0013-map-scripts.md)). When you add a feature, add a section for it there; `StarterMapTests` checks every command in it succeeds. Name road ends by position, never by node ID.
 
@@ -61,7 +61,7 @@ dotnet build                                          # build the solution
 dotnet test                                           # run all tests
 dotnet run --project src/Simulacity.Simulator         # run the simulator with the starting map (reads commands from stdin)
 dotnet run --project src/Simulacity.Simulator -- --empty   # ...or with an empty map (or --map <file>)
-dotnet run --project src/Simulacity.Renderer.Console  # run the renderer (in another terminal; WASD/arrows, +/-, F)
+dotnet run --project src/Simulacity.Renderer.Console  # run the renderer (in another terminal; WASD/arrows, +/-, F, H)
 ```
 
 Build and test before committing. The build treats warnings as errors.

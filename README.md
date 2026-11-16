@@ -70,7 +70,7 @@ The simulator starts with the **starting map**, [`maps/starter.txt`](maps/starte
 dotnet run --project src/Simulacity.Simulator -- --empty
 ```
 
-The renderer draws the map from above, with north at the top: `.` ground, `~` water, `#` road, `=` bridge, `:` tunnel and `o` node. It starts at one row per 10 m cell. Move around with **WASD** or the **arrow keys**, zoom with **`+`** and **`-`**, and press **`F`** to fit the whole map ([decision 0014](docs/decisions/0014-renderer-view-controls.md)).
+The renderer draws the map from above, with north at the top: `.` ground, `~` water, `#` road, `=` bridge, `:` tunnel and `o` node. It starts at one row per 10 m cell. Move around with **WASD** or the **arrow keys**, zoom with **`+`** and **`-`**, and press **`F`** to fit the whole map ([decision 0014](docs/decisions/0014-renderer-view-controls.md)). The land is coloured by height, from dark green for the lowest ground to light grey for the highest, with a key under the map. Press **`H`** to turn the colours off ([decision 0015](docs/decisions/0015-height-as-colour.md)).
 
 For example, on an empty map, to dig a river and build a road across it on a bridge:
 

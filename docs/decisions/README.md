@@ -29,3 +29,4 @@ Don't edit an accepted decision to change it. Write a new record and set the old
 | [0012](0012-bridges-and-tunnels-from-height.md) | Water is crossed on bridges or in tunnels, worked out from height | Accepted |
 | [0013](0013-map-scripts.md) | Maps are command scripts, and the simulator starts with a starting map | Accepted |
 | [0014](0014-renderer-view-controls.md) | The renderer can move its view around the map | Accepted |
+| [0015](0015-height-as-colour.md) | The console renderer shows height as colour bands | Accepted |

@@ -53,23 +53,24 @@ catch (OperationCanceledException)
 internal sealed class Screen
 {
     private const string Title = "Simulacity renderer";
-    private const string Controls = "WASD or arrows: move   + -: zoom   F: fit the map   Q or Ctrl+C: exit";
+    private const string Controls = "WASD or arrows: move   + -: zoom   F: fit the map   H: heights on/off   Q or Ctrl+C: exit";
 
-    // The title, the info line, the legend, the controls and the blank lines between them.
-    private const int LinesAroundMap = 8;
+    // The title, the info line, the legends, the controls and the blank lines between them.
+    private const int LinesAroundMap = 9;
 
     private readonly Lock _lock = new();
     private SimulationSnapshot? _snapshot;
     private MapViewport? _view;
     private (int Columns, int Rows) _space;
     private (int Width, int Height) _window;
+    private bool _showHeights = true;
 
     public void ShowMessage(string message)
     {
         lock (_lock)
         {
             _snapshot = null;
-            Write([message]);
+            Write([new Line(message)]);
         }
     }
 
@@ -134,6 +135,13 @@ internal sealed class Screen
             return;
         }
 
+        if (key.Key == ConsoleKey.H)
+        {
+            _showHeights = !_showHeights;
+            Redraw();
+            return;
+        }
+
         LandSnapshot land = _snapshot.Land;
         (int columns, int rows) = _space;
         MapViewport? moved = (key.Key, key.KeyChar) switch
@@ -177,20 +185,35 @@ internal sealed class Screen
             $"Tick {_snapshot.Tick}   Map {land.Width} × {land.Height} cells of {land.CellSize} m   "
             + $"Roads: {_snapshot.Roads.Nodes.Count} nodes, {_snapshot.Roads.Segments.Count} segments   "
             + $"View centre ({centreX:0}, {centreY:0}) m, {_view.MetresPerRow:0.##} m per row";
-        IReadOnlyList<string> map = MapView.Draw(_snapshot, _view, _space.Columns, _space.Rows);
-        Write([info, string.Empty, .. map, string.Empty, MapView.Legend, Controls]);
+        MapPicture picture = MapView.Render(_snapshot, _view, _space.Columns, _space.Rows);
+
+        // Colours only make sense in a terminal. Height is shown as the background of the land (decision 0015).
+        bool colour = _showHeights && !Console.IsOutputRedirected;
+        HeightShading shading = HeightShading.For(land);
+        (string legendText, string legendColoured) = shading.Legend();
+        var lines = new List<Line> { new(info), new(string.Empty) };
+        for (int row = 0; row < picture.Rows.Count; row++)
+        {
+            lines.Add(new Line(picture.Rows[row], colour ? shading.Colour(picture, row) : null));
+        }
+
+        lines.Add(new Line(string.Empty));
+        lines.Add(new Line(MapView.Legend));
+        lines.Add(_showHeights ? new Line(legendText, colour ? legendColoured : null) : new Line("Height: hidden (press H)"));
+        lines.Add(new Line(Controls));
+        Write(lines);
     }
 
     /// <summary>Draws over the whole window from the top, so a redraw doesn't flicker.</summary>
-    private void Write(IReadOnlyList<string> lines)
+    private void Write(IReadOnlyList<Line> lines)
     {
         if (Console.IsOutputRedirected)
         {
             Console.WriteLine(Title);
             Console.WriteLine();
-            foreach (string line in lines)
+            foreach (Line line in lines)
             {
-                Console.WriteLine(line);
+                Console.WriteLine(line.Text);
             }
 
             return;
@@ -206,11 +229,20 @@ internal sealed class Screen
         Console.CursorVisible = false;
         Console.SetCursorPosition(0, 0);
         var text = new System.Text.StringBuilder();
-        List<string> all = [Title, string.Empty, .. lines];
+        List<Line> all = [new(Title), new(string.Empty), .. lines];
         for (int row = 0; row < Math.Min(all.Count, height - 1); row++)
         {
-            string line = all[row].Length >= width ? all[row][..(width - 1)] : all[row];
-            text.Append(line.PadRight(width - 1)).Append('\n');
+            Line line = all[row];
+            if (line.Text.Length >= width)
+            {
+                text.Append(line.Text[..(width - 1)]); // Too long to colour safely, so plain and cut.
+            }
+            else
+            {
+                text.Append(line.Coloured ?? line.Text).Append(' ', width - 1 - line.Text.Length);
+            }
+
+            text.Append('\n');
         }
 
         for (int row = all.Count; row < height - 1; row++)
@@ -234,3 +266,6 @@ internal sealed class Screen
         return (Math.Max(width - 1, 2), Math.Max(height - LinesAroundMap, 1));
     }
 }
+
+/// <summary>A line of the screen: its plain text, and optionally the same with colour codes.</summary>
+internal readonly record struct Line(string Text, string? Coloured = null);

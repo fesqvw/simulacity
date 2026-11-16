@@ -18,7 +18,7 @@
 - [x] Decide what the simulator sends to renderers: full snapshots of land, terrain and road polylines, as JSON ([0010](decisions/0010-snapshot-contents.md))
 - [x] Define a starting map with a bit of everything, as a command script the simulator loads at startup (`maps/starter.txt`, [0013](decisions/0013-map-scripts.md)). Add a section to it for each new feature
 - [x] Let the renderer move around big maps: WASD or arrows, `+`/`-` to zoom, `F` to fit ([0014](decisions/0014-renderer-view-controls.md))
-- [ ] Show terrain height in the console renderer (the starting map's hill can't be seen yet)
+- [x] Show terrain height in the console renderer, as colour bands with a key (`H` turns them off, [0015](decisions/0015-height-as-colour.md))
 - [x] Simulator commands to add roads, paint land and set terrain height (`node`, `road`, `remove`, `roads`, `land`, `height`)
 - [x] Land grid and road graph (intersections and polyline segments) in `Simulacity.Core`, owned by `World`
 - [x] Make the world 3D: z elevation on every point, and a terrain heightmap on the land grid ([0009](decisions/0009-3d-world.md))

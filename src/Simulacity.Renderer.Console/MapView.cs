@@ -151,7 +151,14 @@ public static class MapView
 
     /// <summary>Draws the part of the map a viewport shows, in exactly <paramref name="columns"/> by <paramref name="rows"/> characters.</summary>
     /// <returns>The rows, from north to south. Anything off the map is blank.</returns>
-    public static IReadOnlyList<string> Draw(SimulationSnapshot snapshot, MapViewport view, int columns, int rows)
+    public static IReadOnlyList<string> Draw(SimulationSnapshot snapshot, MapViewport view, int columns, int rows) =>
+        Render(snapshot, view, columns, rows).Rows;
+
+    /// <summary>
+    /// Draws the part of the map a viewport shows, and also says what land is under each character
+    /// and how high it is, so the map can be coloured by height.
+    /// </summary>
+    public static MapPicture Render(SimulationSnapshot snapshot, MapViewport view, int columns, int rows)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
         ArgumentNullException.ThrowIfNull(view);
@@ -173,7 +180,31 @@ public static class MapView
             canvas.Plot(node.Position.X, node.Position.Y, Node, NodeLayer);
         }
 
-        return canvas.Rows();
+        return canvas.Picture();
+    }
+
+    /// <summary>The ground elevation under a position, interpolated bilinearly between the corners of its cell (decision 0009).</summary>
+    /// <returns>The elevation, or null if the position is off the map.</returns>
+    public static double? GroundElevation(LandSnapshot land, double x, double y)
+    {
+        ArgumentNullException.ThrowIfNull(land);
+
+        double u = x / land.CellSize;
+        double v = y / land.CellSize;
+        if (!(u >= 0 && u <= land.Width && v >= 0 && v <= land.Height))
+        {
+            return null;
+        }
+
+        int i = Math.Min((int)u, land.Width - 1);
+        int j = Math.Min((int)v, land.Height - 1);
+        double fx = u - i;
+        double fy = v - j;
+        double Corner(int ci, int cj) => land.CornerElevations[(cj * (land.Width + 1)) + ci];
+
+        double south = Lerp(Corner(i, j), Corner(i + 1, j), fx);
+        double north = Lerp(Corner(i, j + 1), Corner(i + 1, j + 1), fx);
+        return Lerp(south, north, fy);
     }
 
     private static double Lerp(double a, double b, double t) => a + ((b - a) * t);
@@ -188,6 +219,8 @@ public static class MapView
         private readonly int _rows;
         private readonly char[,] _chars;
         private readonly int[,] _layers;
+        private readonly LandKind?[,] _landUnder;
+        private readonly double[,] _elevations;
 
         public Canvas(LandSnapshot land, MapViewport view, int columns, int rows)
         {
@@ -199,6 +232,8 @@ public static class MapView
             _rows = rows;
             _chars = new char[rows, columns];
             _layers = new int[rows, columns];
+            _landUnder = new LandKind?[rows, columns];
+            _elevations = new double[rows, columns];
         }
 
         public void DrawLand()
@@ -219,8 +254,10 @@ public static class MapView
 
                     int cellX = Math.Clamp((int)(x / _land.CellSize), 0, _land.Width - 1);
                     int cellY = Math.Clamp((int)(y / _land.CellSize), 0, _land.Height - 1);
-                    bool water = _land.Cells[(cellY * _land.Width) + cellX] == LandKind.Water;
-                    _chars[row, column] = water ? Water : Ground;
+                    LandKind kind = _land.Cells[(cellY * _land.Width) + cellX];
+                    _chars[row, column] = kind == LandKind.Water ? Water : Ground;
+                    _landUnder[row, column] = kind;
+                    _elevations[row, column] = GroundElevation(_land, x, y) ?? 0;
                 }
             }
         }
@@ -282,7 +319,9 @@ public static class MapView
             _layers[row, column] = layer;
         }
 
-        public IReadOnlyList<string> Rows()
+        public MapPicture Picture() => new(Rows(), _landUnder, _elevations);
+
+        private string[] Rows()
         {
             var rows = new string[_rows];
             for (int row = 0; row < _rows; row++)
@@ -300,3 +339,9 @@ public static class MapView
         }
     }
 }
+
+/// <summary>A drawn map, with what's under each character so it can be coloured.</summary>
+/// <param name="Rows">The characters, row by row from north to south.</param>
+/// <param name="LandUnder">The land under each character, by [row, column], or null where it's off the map.</param>
+/// <param name="Elevations">The ground elevation in the middle of each character, by [row, column], in metres.</param>
+public sealed record MapPicture(IReadOnlyList<string> Rows, LandKind?[,] LandUnder, double[,] Elevations);
