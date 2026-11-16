@@ -16,7 +16,7 @@ public static class SnapshotBuilder
     {
         ArgumentNullException.ThrowIfNull(simulation);
 
-        return new SimulationSnapshot(simulation.Tick, From(simulation.World.Land), From(simulation.World.Roads));
+        return new SimulationSnapshot(simulation.Tick, From(simulation.World.Land), From(simulation.World));
     }
 
     private static LandSnapshot From(LandGrid land)
@@ -48,8 +48,9 @@ public static class SnapshotBuilder
         return new LandSnapshot(land.Width, land.Height, land.CellSize, cells, elevations);
     }
 
-    private static RoadsSnapshot From(RoadNetwork roads)
+    private static RoadsSnapshot From(World world)
     {
+        RoadNetwork roads = world.Roads;
         RoadNodeSnapshot[] nodes =
         [
             .. roads.Nodes
@@ -65,11 +66,23 @@ public static class SnapshotBuilder
                     segment.Id.Value,
                     segment.Start.Value,
                     segment.End.Value,
-                    [.. roads.PolylineOf(segment.Id).Select(ToPosition)])),
+                    [.. roads.PolylineOf(segment.Id).Select(ToPosition)],
+                    [.. world.StretchesOf(segment.Id).Select(ToStretch)])),
         ];
 
         return new RoadsSnapshot(nodes, segments);
     }
+
+    private static RoadStretchSnapshot ToStretch(RoadStretch stretch) =>
+        new(
+            stretch.Level switch
+            {
+                RoadLevel.Ground => RoadLevelKind.Ground,
+                RoadLevel.Bridge => RoadLevelKind.Bridge,
+                RoadLevel.Tunnel => RoadLevelKind.Tunnel,
+                RoadLevel other => throw new InvalidOperationException($"Road level {other} has no snapshot equivalent."),
+            },
+            [.. stretch.Points.Select(ToPosition)]);
 
     private static Position ToPosition(Point3 point) => new(point.X, point.Y, point.Z);
 }

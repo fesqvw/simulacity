@@ -16,12 +16,16 @@
 ## Next: first playable slice
 
 - [x] Decide what the simulator sends to renderers: full snapshots of land, terrain and road polylines, as JSON ([0010](decisions/0010-snapshot-contents.md))
-- [ ] Load or define a small map (ground and water). The simulator starts with an all-ground 64 × 32 grid of 10 m cells for now
+- [x] Define a starting map with a bit of everything, as a command script the simulator loads at startup (`maps/starter.txt`, [0013](decisions/0013-map-scripts.md)). Add a section to it for each new feature
+- [x] Let the renderer move around big maps: WASD or arrows, `+`/`-` to zoom, `F` to fit ([0014](decisions/0014-renderer-view-controls.md))
+- [x] Show terrain height in the console renderer, as colour bands with a key (`H` turns them off, [0015](decisions/0015-height-as-colour.md))
 - [x] Simulator commands to add roads, paint land and set terrain height (`node`, `road`, `remove`, `roads`, `land`, `height`)
 - [x] Land grid and road graph (intersections and polyline segments) in `Simulacity.Core`, owned by `World`
 - [x] Make the world 3D: z elevation on every point, and a terrain heightmap on the land grid ([0009](decisions/0009-3d-world.md))
-- [ ] Decide what happens when a road runs over water at ground level: forbid it, or let it be a ford. Today it is allowed and drawn as a normal road
-- [ ] Split segments where a new road crosses an existing one at the same height (segment intersection, then a spatial index). Roads at different heights pass over or under each other
+- [x] Decide what happens when a road runs over water at ground level: it is refused, and water is crossed on bridges or in tunnels, worked out from height ([0012](decisions/0012-bridges-and-tunnels-from-height.md))
+- [x] Split segments where a new road crosses an existing one at the same height. Roads at different heights pass over or under each other ([0011](decisions/0011-roads-meet-at-crossings.md))
+- [ ] Add a spatial index for road pieces, so adding a road doesn't check every segment (0011)
+- [ ] Handle a road that crosses itself, and decide whether two nodes in the same place should be merged (0011)
 - [x] Render the map: land, roads, bridges, tunnels and nodes, top-down and scaled to fit the console (`MapView`)
 
 ## Later
@@ -29,7 +33,8 @@
 - [ ] Buildings: residential, industrial, commercial
 - [ ] Transport: foot, car, then public transport (bus, tram, train, subway)
 - [ ] Entities moving through the network
-- [ ] Bridges and tunnels: decide whether they are only derived from road height against terrain, or also stored on the segment ([0009](decisions/0009-3d-world.md))
+- [x] Bridges and tunnels: only derived from road height against terrain, never stored ([0012](decisions/0012-bridges-and-tunnels-from-height.md))
+- [ ] Bridge clearance and maximum road slope, once building has a cost (0012)
 - [ ] Spline road segments for smooth curves, as a second segment shape alongside polylines ([0009](decisions/0009-3d-world.md))
 - [ ] Connect the simulation core to a Godot project (first check that the Godot version can reference `net10.0` libraries, see 0006)
 - [ ] Import real cities from OpenStreetMap

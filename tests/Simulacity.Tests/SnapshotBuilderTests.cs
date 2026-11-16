@@ -87,6 +87,24 @@ public class SnapshotBuilderTests
     }
 
     [Fact]
+    public void Segments_are_sent_with_their_bridge_and_tunnel_stretches()
+    {
+        RoadNetwork roads = _simulation.World.Roads;
+        RoadNode a = roads.AddNode(new Point3(0, 5, 0));
+        RoadNode b = roads.AddNode(new Point3(20, 5, 0));
+        roads.AddSegment(a.Id, b.Id, new PolylineShape([new Point3(10, 5, -10)]));
+
+        RoadSegmentSnapshot segment = Assert.Single(SnapshotBuilder.From(_simulation).Roads.Segments);
+
+        Assert.Equal(
+            [RoadLevelKind.Ground, RoadLevelKind.Tunnel, RoadLevelKind.Ground],
+            segment.Stretches.Select(stretch => stretch.Level));
+        Assert.Equal(new Position(0, 5, 0), segment.Stretches[0].Points[0]);
+        Assert.Equal(new Position(10, 5, -10), segment.Stretches[1].Points[1]);
+        Assert.Equal(new Position(20, 5, 0), segment.Stretches[2].Points[^1]);
+    }
+
+    [Fact]
     public void A_snapshot_is_a_copy_that_later_changes_do_not_affect()
     {
         SimulationSnapshot before = SnapshotBuilder.From(_simulation);

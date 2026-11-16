@@ -1,0 +1,75 @@
+# The starting map: a bit of everything, one section per feature (decision 0013).
+#
+# Each line is a simulator command, and everything after # is a comment. Roads name their ends
+# by position (x,y in metres, with the ground height there, or x,y,z), so sections don't depend on
+# node numbers and can be added, removed or reordered freely. To try out a new feature, add a
+# section for it at the end, somewhere on the map that's still free.
+#
+# The map is 1600 m × 800 m. x runs east and y north, from the south-west corner.
+#
+#   y 800 +----------------------------------------------------------------+
+#         | Interchange      | River  | East side  Road over the hill      |
+#     500 |   and curves     |  ~~    |            Hill                    |
+#     400 +------------------+  ~~    |            Tunnel through the hill |
+#         | Downtown grid    |  ~~    |                                    |
+#     100 |                  |  ~~    |            Lake, with a long bridge|
+#       0 +----------------------------------------------------------------+
+#         0                 600     650         900                    1600 x
+
+new 160 80 10
+
+## Terrain and water
+# A river from south to north, 600 m to 640 m from the west edge.
+land water 60 0 63 79
+# A lake in the south-east, 1000 m to 1220 m east and 50 m to 200 m north.
+land water 100 5 121 19
+# A 30 m hill in the north-east.
+hill 1250 600 200 30
+
+## Downtown grid
+# Four streets and five avenues, 100 m apart. Where they cross, they meet at junctions (decision 0011).
+road 100,100 500,100
+road 100,200 500,200
+road 100,300 500,300
+road 100,400 500,400
+road 100,100 100,400
+road 200,100 200,400
+road 300,100 300,400
+road 400,100 400,400
+road 500,100 500,400
+
+## River crossings
+# A bridge: the road climbs to an 8 m deck over the river (decision 0012).
+road 500,300 740,300 580,300,8 660,300,8
+# A tunnel: the road dips 8 m under the riverbed.
+road 500,100 740,100 570,100,-8 670,100,-8
+# A road along the east bank. It passes under the bridge and over the tunnel without meeting them.
+road 650,20 650,780
+
+## East side
+# A north–south road joining the river crossings to the lake and the hill.
+road 740,300 900,300
+road 740,100 900,100
+road 650,400 900,400
+road 900,100 900,680
+
+## Lake
+# A long bridge 6 m over the lake, and a road along its north shore.
+road 900,100 1300,100 980,100,6 1240,100,6
+road 900,210 1300,210
+
+## Hill
+# A road at ground level all the way, so it follows the hill up and down through these points.
+road 900,680 1590,680 1050,680 1075,680 1100,680 1125,680 1150,680 1175,680 1200,680 1225,680 1250,680 1275,680 1300,680 1325,680 1350,680 1375,680 1400,680 1425,680 1450,680
+# A straight, level road through the hill. Where the hill rises more than 1 m above it, it becomes a tunnel.
+road 900,520 1590,520
+
+## Interchange and curves
+# A road from downtown north to an east–west road, which an overpass crosses on a 7 m bridge.
+road 100,400 100,600
+road 100,600 500,600
+road 300,450 300,750 300,520,7 300,680,7
+# A T-junction: a side road that ends on the east–west road.
+road 200,600 200,750
+# A curved road, as a polyline through several points.
+road 400,450 550,760 470,470 520,540 540,640

@@ -57,4 +57,25 @@ public sealed record RoadNodeSnapshot(int Id, Position Position);
 /// The segment as a polyline to draw, from the start node's position to the end node's.
 /// Curved shapes are already sampled into points (decision 0010).
 /// </param>
-public sealed record RoadSegmentSnapshot(int Id, int Start, int End, IReadOnlyList<Position> Points);
+/// <param name="Stretches">
+/// The same polyline split where the road goes onto a bridge, into a tunnel or back onto the ground,
+/// in order from the start node (decision 0012).
+/// </param>
+public sealed record RoadSegmentSnapshot(
+    int Id, int Start, int End, IReadOnlyList<Position> Points, IReadOnlyList<RoadStretchSnapshot> Stretches);
+
+/// <summary>Whether a stretch of road is on the ground, a bridge or a tunnel.</summary>
+public enum RoadLevelKind
+{
+    /// <summary>On the ground.</summary>
+    Ground,
+
+    /// <summary>Above the ground or water.</summary>
+    Bridge,
+
+    /// <summary>Below the ground or water.</summary>
+    Tunnel,
+}
+
+/// <summary>A stretch of a road segment at one level, as a polyline to draw.</summary>
+public sealed record RoadStretchSnapshot(RoadLevelKind Level, IReadOnlyList<Position> Points);
