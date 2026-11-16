@@ -34,6 +34,7 @@ All project knowledge goes in `docs/`. Keep it current as part of the work, not 
 
 - Don't commit build output, IDE files or local settings. Extend `.gitignore` when a new toolchain adds any.
 - Keep commits focused, with messages that say what changed and why.
+- Don't add attribution trailers to commit messages: no `Co-Authored-By` line and no `Claude-Session` link.
 - When the build, test or run commands are set up, document them in the **Commands** section below and in the README.
 
 ## Project layout
